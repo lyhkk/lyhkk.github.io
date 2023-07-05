@@ -18,4 +18,135 @@
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
   </entry>
+  <entry>
+    <title>C++ STL</title>
+    <url>/2023/07/05/C-STL/</url>
+    <content><![CDATA[<h2 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h2><ol>
+<li><p>全称：Standard Template Library,标准模板库</p>
+</li>
+<li><p><img src="C:/Users/86136/lyhkk/大二/C++/assets/image-20230409145131333.png" alt="image-20230409145131333"></p>
+<blockquote>
+<p>迭代器是沟通算法和容器的桥梁，容器相当于数据结构，算法根据容器提供的迭代器进行操作 -&gt; 数据结构有了配套的操作</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h2><p><img src="C:/Users/86136/lyhkk/大二/C++/assets/image-20230409145354236.png" alt="image-20230409145354236"></p>
+<blockquote>
+<p>容器更像一个类</p>
+</blockquote>
+<h3 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h3><ol>
+<li><p>特点：</p>
+<ol>
+<li>拥有一段连续的内存空间，因此它能非常好的&#x3D;&#x3D;支持随机访问&#x3D;&#x3D;，即 [] 操作符和 .at()，随机访问快。（优点）</li>
+<li>当向其头部或中间插入或删除元素时，为了&#x3D;&#x3D;保持原本的相对次序&#x3D;&#x3D;，插入或删除点之后的所有元素都必须移动，所以&#x3D;&#x3D;插入或删除的效率比较低&#x3D;&#x3D;。（缺点）</li>
+<li>在后面插入删除元素最快，此时一般不需要移动内存。（优点）</li>
+<li>总结：相当于可拓展的数组（&#x3D;&#x3D;动态数组&#x3D;&#x3D;），随机访问快，在头部和中间插入或删除效率低，但在尾部插入或删除效率高。</li>
+</ol>
+</li>
+<li><p>操作：</p>
+<p>1.<code>push_back</code> 在数组的最后添加一个数据</p>
+<p>2.pop_back 去掉数组的最后一个数据</p>
+<p>3.<code>at</code> 得到编号位置的数据</p>
+<p>4.begin 得到数组头的指针</p>
+<p>5.end 得到数组的最后一个单元+1的指针</p>
+<p>6.front 得到数组头的引用</p>
+<p>7.back 得到数组的最后一个单元的引用</p>
+<p>8.max_size 得到vector最大可以是多大</p>
+<p>9.capacity 当前vector分配的大小</p>
+<p>10.<code>size</code> 当前使用数据的大小</p>
+<p>11.resize 改变当前使用数据的大小，如果它比当前使用的大，者填充默认值</p>
+<p>12.reserve 改变当前vecotr所分配空间的大小</p>
+<p>13.erase 删除指针指向的数据项</p>
+<p>14.<code>clear</code> 清空当前的vector</p>
+<p>15.rbegin 将vector反转后的开始指针返回(其实就是原来的end-1)</p>
+<p>16.rend 将vector反转构的结束指针返回(其实就是原来的begin-1)</p>
+<p>17.empty 判断vector是否为空</p>
+<p>18.swap 与另一个vector交换数据</p>
+</li>
+<li><p>特性：</p>
+<ol>
+<li>在动态扩容上，vector动态增加大小时，并不是在原空间之后持续新空间（因为无法保证原空间之后尚有可供配置的空间），而是&#x3D;&#x3D;以原大小的两倍另外配置一块较大的空间，然后将原内容拷贝过来&#x3D;&#x3D;，然后才开始在原内容之后构造新元素，并释放原空间。因此， 对vector的任何操作，&#x3D;&#x3D;一旦引起空间重新配置，指向原vector的所有迭代器就都失效了&#x3D;&#x3D;。</li>
+</ol>
+</li>
+</ol>
+<h3 id="deque"><a href="#deque" class="headerlink" title="deque"></a>deque</h3><ol>
+<li><p>deque（double-ended queue）是双向开口的连续内存空间（动态将多个连续空间通过指针数组接合在一起），随时可以增加一段新的空间。deque 的最大任务就是&#x3D;&#x3D;在这些分段的连续空间上，维护其整体连续的假象，并提供随机存取的接口&#x3D;&#x3D;。</p>
+</li>
+<li><p><strong>特点</strong></p>
+<ul>
+<li><p>一旦要在 deque 的头部和尾部增加新空间，便配置一段定量连续空间，串在整个 deque 的头部或尾部，因此不论在头部或尾部插入元素都十分迅速。 (优点）</p>
+</li>
+<li><p>在中间部分安插元素则比较费时，因为必须移动其它元素。（缺点）</p>
+</li>
+<li><p>deque 是 list 和 vector 的折中方案。兼有 list 的优点，也有 vector 随机访问效率高的优点。</p>
+</li>
+<li><p>总结：支持随机访问，但效率没有 vector 高，在头部和尾部插入或删除效率高，但在中间插入或删除效率低。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="set"><a href="#set" class="headerlink" title="set"></a>set</h3><ol>
+<li>每个元素最多只出现一次，并且 set 中的元素已经从小到大排好序</li>
+<li><strong>特点</strong><ul>
+<li>使用红黑树实现，其内部元素依据其值自动排序，每个元素值只能出现一次，不允许重复。</li>
+<li>每次插入值的时候，都需要调整红黑树，效率有一定影响。（缺点）</li>
+<li>map 和 set 的插入或删除效率比用其他序列容器高，因为对于关联容器来说，不需要做内存拷贝和内存移动。（优点）</li>
+<li>总结：由红黑树实现，其内部元素依据其值自动排序，每个元素值只能出现一次，不允许重复，且插入和删除效率比用其他序列容器高。</li>
+</ul>
+</li>
+</ol>
+<h3 id="list"><a href="#list" class="headerlink" title="list"></a>list</h3><p>List 由双向链表（doubly linked list）实现而成，元素<u>存放在堆中</u>，每个元素都是放在一块内存中。没有空间预留习惯，所以<u>每分配一个元素都会从内存中分配，每删除一个元素都会释放它占用的内存</u>。</p>
+<p><strong>特点</strong></p>
+<ul>
+<li>内存空间可以是不连续的，通过指针来进行数据的访问，这个特点使得它的随机存取变得非常没有效率，因此它没有提供 [] 操作符的重载。（缺点）</li>
+<li>由于链表的特点，在任意位置的插入和删除效率都较高。（优点）</li>
+<li><u>只支持首尾两个元素的直接存取</u>，想获取其他元素（访问时间一样），则需要遍历链表。（缺点）</li>
+<li>总结：不支持随机访问，<u>在任意位置的插入和删除效率都较高</u>。</li>
+</ul>
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>map 由红黑树实现，其元素都是 &#x3D;&#x3D;“键值&#x2F;实值”&#x3D;&#x3D;所形成的一个对组（key&#x2F;value pairs)。</p>
+<p>map 主要用于资料一对一映射的情况，map 内部自建一颗红黑树，这颗树具有对数据自动排序的功能，所以在 map 内部所有的数据都是有序的。比如一个班级中，每个学生的学号跟他的姓名就存在着一对一映射的关系。</p>
+<p><strong>特点</strong></p>
+<ul>
+<li>每个元素都有一个键，且只能出现一次，不允许重复。</li>
+<li>根据 key 值快速查找记录，查找的复杂度基本是 O(logN)，如果有 1000 个记录，二分查找最多查找 10次(1024)。（优点）</li>
+<li>每次插入值的时候，都需要调整红黑树，效率有一定影响。（缺点）</li>
+<li>增加和删除节点对迭代器的影响很小，除了那个操作节点，对其他的节点都没有什么影响。（优点）</li>
+<li>对于迭代器来说，可以修改实值，而不能修改 key。</li>
+<li>总结：元素为键值对，key 和 value 可以是&#x3D;&#x3D;任意你需要的类型&#x3D;&#x3D;，每个元素都有一个键，且只能出现一次，不允许重复，根据 key 快速查找记录。</li>
+</ul>
+<p><strong>适用场景</strong></p>
+<p>适用于需要存储一个数据字典，并要求方便地根据key找value的场景。</p>
+<h2 id="iterator"><a href="#iterator" class="headerlink" title="iterator"></a>iterator</h2><ol>
+<li><p>迭代器类似指针，指向容器中的某个元素，用-&gt;(如果容器中的元素是pair，可以用it-&gt;first与it-&gt;second访问第一个和第二个值)或者*(元素为一个值)访问指向的元素</p>
+</li>
+<li><p>容器适配器 stack、queue 和 priority_queue &#x3D;&#x3D;没有&#x3D;&#x3D;迭代器。容器适配器有一些成员函数，可以用来对元素进行访问。</p>
+</li>
+<li><p>分类：</p>
+<ol>
+<li>正向：容器类名&lt;&gt;::iterator 迭代器名;</li>
+<li>反向：容器类名&lt;&gt;::reverse_iterator 迭代器名;</li>
+<li>常量正向：容器类名&lt;&gt;::const_iterator 迭代器名;</li>
+<li>常量反向：容器类名&lt;&gt;::const_reverse_iterator 迭代器名;</li>
+</ol>
+</li>
+<li><p>迭代器都可以进行<code>++</code>操作。反向迭代器和正向迭代器的区别在于：</p>
+<ul>
+<li><p>对正向迭代器进行<code>++</code>操作时，迭代器会指向容器中的后一个元素；</p>
+</li>
+<li><p>而对反向迭代器进行<code>++</code>操作时，迭代器会指向容器中的前一个元素。</p>
+<blockquote>
+<p>使用正向&#x2F;反向迭代器写for循环迭代时，要写it !&#x3D; container.end()&#x2F;rend()而不是&lt;&#x3D;，因为反向迭代器的++是反向的，都这么写美观整齐</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>语言</category>
+      </categories>
+      <tags>
+        <tag>C++</tag>
+      </tags>
+  </entry>
 </search>
