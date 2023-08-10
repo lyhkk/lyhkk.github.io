@@ -9,7 +9,7 @@
 <li>实验难点：<code>mmcv</code>和<code>mmseg</code>的安装，环境配置</li>
 <li>硬件环境：腾讯云租用<code>V100 GPU服务器</code>(特价)，32G显存，10核</li>
 </ol>
-<h2 id="配置环境："><a href="#配置环境：" class="headerlink" title="配置环境："></a>配置环境：</h2><p><strong>2023.8.8：</strong>先按照现有环境(cuda&#x3D;11.8.0, torch&#x3D;2.0.1)直接装mmcv和mmseg试试看</p>
+<h2 id="配置环境"><a href="#配置环境" class="headerlink" title="配置环境"></a>配置环境</h2><p><strong>2023.8.8：</strong>先按照现有环境(cuda&#x3D;11.8.0, torch&#x3D;2.0.1)直接装mmcv和mmseg试试看</p>
 <blockquote>
 <p>目前环境：</p>
 <p>mmseg&#x3D;1.1.1<br>mmcv&#x3D;2.0.1<br>mmengine&#x3D;0.8.4(mmengine为mmcv大改之后新增的库，支持很多原来放在mmcv里的接口，比方说train的代码，data_parallel的内容)</p>
@@ -32,7 +32,7 @@
 </li>
 <li><p>因为mmcv包括了一些cuda运算的内容，<strong>mmcv必须与torch、cuda版本匹配，同时也有不支持的python版本</strong></p>
 <ol>
-<li><p>发现一个html网页(格式为:<a href="https://download.openmmlab.com/mmcv/dist/cu">https://download.openmmlab.com/mmcv/dist/cu</a><xxx>&#x2F;torch&lt;x.x.x&gt;&#x2F;index.html，其中xxx和x.x.x代表版本号)可以查找，特定torch和cuda版本下的mmcv的.whl包。</p>
+<li><p>发现一个html网页(格式为:download.openmmlab.com&#x2F;mmcv&#x2F;dist&#x2F;cu<xxx>&#x2F;torch&lt;x.x.x&gt;&#x2F;index.html，其中xxx和x.x.x代表版本号)可以查找，特定torch和cuda版本下的mmcv的.whl包。</p>
 </li>
 <li><p>尝试不同版本号，最终找到<a href="https://download.openmmlab.com/mmcv/dist/cu110/torch1.7.0/index.html">合适的版本</a>为：cuda&#x3D;11.0，torch&#x3D;1.7.0，python&#x3D;3.8。下载.whl包</p>
 <p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241757.png" alt="image-20230810221836793"></p>
