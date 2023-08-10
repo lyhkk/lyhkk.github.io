@@ -32,7 +32,8 @@
 </li>
 <li><p>因为mmcv包括了一些cuda运算的内容，<strong>mmcv必须与torch、cuda版本匹配，同时也有不支持的python版本</strong></p>
 <ol>
-<li><p>发现一个html网页(格式为:download.openmmlab.com&#x2F;mmcv&#x2F;dist&#x2F;cu<xxx>&#x2F;torch&lt;x.x.x&gt;&#x2F;index.html，其中xxx和x.x.x代表版本号)可以查找，特定torch和cuda版本下的mmcv的.whl包。</p>
+<li><p>发现一个html网页(格式为: </p>
+<p> downloadopenmmlab.com&#x2F;mmcv&#x2F;dist&#x2F;cu<xxx>&#x2F;torch&lt;x.x.x&gt;&#x2F;index.html，其中xxx和x.x.x代表版本号)可以查找，特定torch和cuda版本下的mmcv的.whl包。</p>
 </li>
 <li><p>尝试不同版本号，最终找到<a href="https://download.openmmlab.com/mmcv/dist/cu110/torch1.7.0/index.html">合适的版本</a>为：cuda&#x3D;11.0，torch&#x3D;1.7.0，python&#x3D;3.8。下载.whl包</p>
 <p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241757.png" alt="image-20230810221836793"></p>
