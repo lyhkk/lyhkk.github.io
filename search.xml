@@ -1,79 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>SWin-Transformer</title>
-    <url>/2023/08/10/SWin-Transformer/</url>
-    <content><![CDATA[<p><a href="https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation"><strong>github仓库地址</strong></a></p>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ol>
-<li>代码是<code>openmmlab</code>用<code>mmcv库</code>和<code>mmseg toolbox</code>实现了训练，验证，测试过程，支持多种语义分割模型，本次实验采用SWin-Transformer为backbone的模型</li>
-<li>实验难点：<code>mmcv</code>和<code>mmseg</code>的安装，环境配置</li>
-<li>硬件环境：腾讯云租用<code>V100 GPU服务器</code>(特价)，32G显存，10核</li>
-</ol>
-<h2 id="配置环境"><a href="#配置环境" class="headerlink" title="配置环境"></a>配置环境</h2><p><strong>2023.8.8：</strong>先按照现有环境(cuda&#x3D;11.8.0, torch&#x3D;2.0.1)直接装mmcv和mmseg试试看</p>
-<blockquote>
-<p>目前环境：</p>
-<p>mmseg&#x3D;1.1.1<br>mmcv&#x3D;2.0.1<br>mmengine&#x3D;0.8.4(mmengine为mmcv大改之后新增的库，支持很多原来放在mmcv里的接口，比方说train的代码，data_parallel的内容)</p>
-<p>官网提供的版本依赖关系：<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241754.png" alt="image-20230808150904656"></p>
-<p>根据官网文档，mmcv和mmseg匹配，但是<code>module not found</code>，因为<code>train</code>的部分已经从mmcv移除</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241756.png" alt="image-20230808151010143"></p>
-</blockquote>
-<p><strong>2023.8.9：</strong></p>
-<blockquote>
-<p>找到的适配环境：</p>
-<p>mmseg&#x3D;0.11.0</p>
-<p>mmcv&#x3D;1.3.0</p>
-<p>torch&#x3D;1.7.0</p>
-<p>cuda&#x3D;11.0</p>
-</blockquote>
-<p>如何找到的环境：</p>
-<ol>
-<li><p>requirements.txt没给出mmcv和mmseg的版本，但源码有mmseg文件夹，进入<code>mmseg/version.py</code>可以得知mmseg需要0.11.0版本，并且需要mmcv满足<code>1.0.4-1.3.0</code>之间</p>
-<p>-&gt;mmcv&#x3D;1.3.0，mmseg&#x3D;0.11.0。</p>
-</li>
-<li><p>因为mmcv包括了一些cuda运算的内容，<strong>mmcv必须与torch、cuda版本匹配，同时也有不支持的python版本</strong></p>
-<ol>
-<li><p>发现一个html网页(格式为: </p>
-<p> downloadopenmmlab.com&#x2F;mmcv&#x2F;dist&#x2F;cu<xxx>&#x2F;torch&lt;x.x.x&gt;&#x2F;index.html，其中xxx和x.x.x代表版本号)可以查找，特定torch和cuda版本下的mmcv的.whl包。</p>
-</li>
-<li><p>尝试不同版本号，最终找到<a href="https://download.openmmlab.com/mmcv/dist/cu110/torch1.7.0/index.html">合适的版本</a>为：cuda&#x3D;11.0，torch&#x3D;1.7.0，python&#x3D;3.8。下载.whl包</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241757.png" alt="image-20230810221836793"></p>
-</li>
-<li><p>重装系统–cuda&#x3D;11.0，再安装mmcv和mmseg。</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241758.png" alt="image-20230810221728646"></p>
-</li>
-</ol>
-</li>
-<li><p>安装mmseg: 但不管是pip和open-mmlab提供的mim包，都找不到mmseg&#x3D;0.11.0(太旧)，所以直接把github库给的源码，复制到对应虚拟环境python3.8的packages </p>
-</li>
-<li><p>安装mmcv: mmcv有mmcv-full, mmcv, mmcv-lite三种，直接pip或mim安装的mmcv包缺少mmseg需要的接口，需要full版本，使用下载的mmcv-full 1.3.0的.whl包，pip安装即可。</p>
-</li>
-<li><p>PS: 因为我是单GPU训练，它的config文件(configs&#x2F;_base&#x2F;models&#x2F;upernet_swin.py)中有一个地方接口没对好，使用了<code>SyncBN</code>，这个需要手动改为<code>BN</code>，改正就可以跑动了。</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241759.png" alt="image-20230810222549116"></p>
-</li>
-</ol>
-<h2 id="训练过程"><a href="#训练过程" class="headerlink" title="训练过程"></a>训练过程</h2><p><strong>2023.8.9:训练SWin-B模型</strong></p>
-<p>对标：</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241760.png" alt="image-20230810224052923"></p>
-<p>开始训练，只加载了预训练模型(github提供)，改动了batch size</p>
-<p>(configs&#x2F;swin&#x2F;upernet_swin_base_patch4_window7_512x512_160k_ade20k.py)中的data段改为<strong>samples_per_gpu&#x3D;8</strong>(因为github是8GPUs分布式训练，我只有单GPU，并且开不到16，&#x3D;8时已经占用24G显存)</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241761.png" alt="image-20230810222731182"></p>
-<blockquote>
-<p>本实验的batch size影响很大，当我samples_per_gpu设为4时，对比作者的log文件，同样15950iterations下</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241762.png" alt="image-20230810223522211"></p>
-</blockquote>
-<p><strong>2023.8.10:</strong></p>
-<p>跑的好慢！！！应该去跑Swin-S的，参数量少，应该速度会快很多</p>
-<p>北京时间22:45，跑到了96k iterations的checkpoint(每16k iterations一次验证), validation结果和github在96k iterations的checkpoint处结果对标：</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102315467.png" alt="image-20230810225538462"></p>
-]]></content>
-      <categories>
-        <category>deep learning</category>
-      </categories>
-      <tags>
-        <tag>semantic segmentation</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C++ STL</title>
     <url>/2023/07/05/C-STL/</url>
     <content><![CDATA[<h2 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h2><ol>
@@ -202,6 +129,84 @@
       </categories>
       <tags>
         <tag>C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SWin-Transformer</title>
+    <url>/2023/08/10/SWin-Transformer/</url>
+    <content><![CDATA[<p><a href="https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation"><strong>github仓库地址</strong></a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ol>
+<li>代码是<code>openmmlab</code>用<code>mmcv库</code>和<code>mmseg toolbox</code>实现了训练，验证，测试过程，支持多种语义分割模型，本次实验采用SWin-Transformer为backbone的模型</li>
+<li>实验难点：<code>mmcv</code>和<code>mmseg</code>的安装，环境配置</li>
+<li>硬件环境：腾讯云租用<code>V100 GPU服务器</code>(特价)，32G显存，10核</li>
+</ol>
+<h2 id="配置环境"><a href="#配置环境" class="headerlink" title="配置环境"></a>配置环境</h2><p><strong>2023.8.8：</strong>先按照现有环境(cuda&#x3D;11.8.0, torch&#x3D;2.0.1)直接装mmcv和mmseg试试看</p>
+<blockquote>
+<p>目前环境：</p>
+<p>mmseg&#x3D;1.1.1<br>mmcv&#x3D;2.0.1<br>mmengine&#x3D;0.8.4(mmengine为mmcv大改之后新增的库，支持很多原来放在mmcv里的接口，比方说train的代码，data_parallel的内容)</p>
+<p>官网提供的版本依赖关系：<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241754.png" alt="image-20230808150904656"></p>
+<p>根据官网文档，mmcv和mmseg匹配，但是<code>module not found</code>，因为<code>train</code>的部分已经从mmcv移除</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241756.png" alt="image-20230808151010143"></p>
+</blockquote>
+<p><strong>2023.8.9：</strong></p>
+<blockquote>
+<p>找到的适配环境：</p>
+<p>mmseg&#x3D;0.11.0</p>
+<p>mmcv&#x3D;1.3.0</p>
+<p>torch&#x3D;1.7.0</p>
+<p>cuda&#x3D;11.0</p>
+</blockquote>
+<p>如何找到的环境：</p>
+<ol>
+<li><p>requirements.txt没给出mmcv和mmseg的版本，但源码有mmseg文件夹，进入<code>mmseg/version.py</code>可以得知mmseg需要0.11.0版本，并且需要mmcv满足<code>1.0.4-1.3.0</code>之间</p>
+<p>-&gt;mmcv&#x3D;1.3.0，mmseg&#x3D;0.11.0。</p>
+</li>
+<li><p>因为mmcv包括了一些cuda运算的内容，<strong>mmcv必须与torch、cuda版本匹配，同时也有不支持的python版本</strong></p>
+<ol>
+<li><p>发现一个html网页(格式为: </p>
+<p> downloadopenmmlab.com&#x2F;mmcv&#x2F;dist&#x2F;cu<xxx>&#x2F;torch&lt;x.x.x&gt;&#x2F;index.html，其中xxx和x.x.x代表版本号)可以查找，特定torch和cuda版本下的mmcv的.whl包。</p>
+</li>
+<li><p>尝试不同版本号，最终找到<a href="https://download.openmmlab.com/mmcv/dist/cu110/torch1.7.0/index.html">合适的版本</a>为：cuda&#x3D;11.0，torch&#x3D;1.7.0，python&#x3D;3.8。下载.whl包</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241757.png" alt="image-20230810221836793"></p>
+</li>
+<li><p>重装系统–cuda&#x3D;11.0，再安装mmcv和mmseg。</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241758.png" alt="image-20230810221728646"></p>
+</li>
+</ol>
+</li>
+<li><p>安装mmseg: 但不管是pip和open-mmlab提供的mim包，都找不到mmseg&#x3D;0.11.0(太旧)，所以直接把github库给的源码，复制到对应虚拟环境python3.8的packages </p>
+</li>
+<li><p>安装mmcv: mmcv有mmcv-full, mmcv, mmcv-lite三种，直接pip或mim安装的mmcv包缺少mmseg需要的接口，需要full版本，使用下载的mmcv-full 1.3.0的.whl包，pip安装即可。</p>
+</li>
+<li><p>PS: 因为我是单GPU训练，它的config文件(configs&#x2F;_base&#x2F;models&#x2F;upernet_swin.py)中有一个地方接口没对好，使用了<code>SyncBN</code>，这个需要手动改为<code>BN</code>，改正就可以跑动了。</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241759.png" alt="image-20230810222549116"></p>
+</li>
+</ol>
+<h2 id="训练过程"><a href="#训练过程" class="headerlink" title="训练过程"></a>训练过程</h2><p><strong>2023.8.9:训练SWin-B模型</strong></p>
+<p>对标：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241760.png" alt="image-20230810224052923"></p>
+<p>开始训练，只加载了预训练模型(github提供)，改动了batch size</p>
+<p>(configs&#x2F;swin&#x2F;upernet_swin_base_patch4_window7_512x512_160k_ade20k.py)中的data段改为<strong>samples_per_gpu&#x3D;8</strong>(因为github是8GPUs分布式训练，我只有单GPU，并且开不到16，&#x3D;8时已经占用24G显存)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241761.png" alt="image-20230810222731182"></p>
+<blockquote>
+<p>本实验的batch size影响很大，当我samples_per_gpu设为4时，对比作者的log文件，同样15950iterations下</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102241762.png" alt="image-20230810223522211"></p>
+</blockquote>
+<p><strong>2023.8.10:</strong></p>
+<p>跑的好慢！！！应该去跑Swin-S的，参数量少，应该速度会快很多</p>
+<p>北京时间22:45，<strong>跑到了96k iterations</strong>的checkpoint(每16k iterations一次验证), validation结果和github在96k iterations的checkpoint处结果对标：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308102315467.png" alt="image-20230810225538462"></p>
+<p><strong>2023.8.11:</strong></p>
+<p>三天<strong>跑完160k iterations</strong>, 最终指标与github对比：(val mAcc不升反降，mmopenlab提供的log文件也有这个现象)</p>
+<p><img src="C:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20230812004324648.png" alt="image-20230812004324648"></p>
+<p>validation过程中，各类别的mIoU和Acc如下：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">+---------------------+-------+-------+</span><br><span class="line">| Class               | IoU   | Acc   |</span><br><span class="line">+---------------------+-------+-------+</span><br><span class="line">| wall                | <span class="number">75.88</span> | <span class="number">87.82</span> |</span><br><span class="line">| building            | <span class="number">81.5</span>  | <span class="number">91.98</span> |</span><br><span class="line">| sky                 | <span class="number">93.95</span> | <span class="number">97.18</span> |</span><br><span class="line">| floor               | <span class="number">80.19</span> | <span class="number">90.6</span>  |</span><br><span class="line">| tree                | <span class="number">74.04</span> | <span class="number">87.05</span> |</span><br><span class="line">| ceiling             | <span class="number">82.28</span> | <span class="number">90.21</span> |</span><br><span class="line">| road                | <span class="number">81.98</span> | <span class="number">89.34</span> |</span><br><span class="line">| bed                 | <span class="number">86.94</span> | <span class="number">95.45</span> |</span><br><span class="line">| windowpane          | <span class="number">60.9</span>  | <span class="number">77.16</span> |</span><br><span class="line">| grass               | <span class="number">67.34</span> | <span class="number">83.15</span> |</span><br><span class="line">| cabinet             | <span class="number">59.51</span> | <span class="number">72.18</span> |</span><br><span class="line">| sidewalk            | <span class="number">64.31</span> | <span class="number">80.8</span>  |</span><br><span class="line">| person              | <span class="number">78.34</span> | <span class="number">90.42</span> |</span><br><span class="line">| earth               | <span class="number">37.37</span> | <span class="number">52.52</span> |</span><br><span class="line">| door                | <span class="number">45.28</span> | <span class="number">59.92</span> |</span><br><span class="line">| table               | <span class="number">59.22</span> | <span class="number">76.1</span>  |</span><br><span class="line">| mountain            | <span class="number">57.24</span> | <span class="number">71.79</span> |</span><br><span class="line">| plant               | <span class="number">52.32</span> | <span class="number">63.37</span> |</span><br><span class="line">| curtain             | <span class="number">69.82</span> | <span class="number">83.09</span> |</span><br><span class="line">| chair               | <span class="number">54.96</span> | <span class="number">69.21</span> |</span><br><span class="line">| car                 | <span class="number">83.77</span> | <span class="number">91.67</span> |</span><br><span class="line">| water               | <span class="number">47.62</span> | <span class="number">61.96</span> |</span><br><span class="line">| painting            | <span class="number">72.41</span> | <span class="number">86.03</span> |</span><br><span class="line">| sofa                | <span class="number">60.08</span> | <span class="number">76.23</span> |</span><br><span class="line">| shelf               | <span class="number">43.32</span> | <span class="number">63.98</span> |</span><br><span class="line">| house               | <span class="number">49.56</span> | <span class="number">62.8</span>  |</span><br><span class="line">| sea                 | <span class="number">51.04</span> | <span class="number">70.59</span> |</span><br><span class="line">| mirror              | <span class="number">62.54</span> | <span class="number">69.18</span> |</span><br><span class="line">| rug                 | <span class="number">60.32</span> | <span class="number">67.46</span> |</span><br><span class="line">| field               | <span class="number">31.73</span> | <span class="number">45.61</span> |</span><br><span class="line">| armchair            | <span class="number">37.61</span> | <span class="number">57.33</span> |</span><br><span class="line">| seat                | <span class="number">59.81</span> | <span class="number">79.95</span> |</span><br><span class="line">| fence               | <span class="number">42.07</span> | <span class="number">56.82</span> |</span><br><span class="line">| desk                | <span class="number">49.49</span> | <span class="number">66.97</span> |</span><br><span class="line">| rock                | <span class="number">47.33</span> | <span class="number">73.48</span> |</span><br><span class="line">| wardrobe            | <span class="number">49.47</span> | <span class="number">68.13</span> |</span><br><span class="line">| lamp                | <span class="number">60.04</span> | <span class="number">71.42</span> |</span><br><span class="line">| bathtub             | <span class="number">75.56</span> | <span class="number">81.97</span> |</span><br><span class="line">| railing             | <span class="number">32.42</span> | <span class="number">47.61</span> |</span><br><span class="line">| cushion             | <span class="number">54.0</span>  | <span class="number">68.56</span> |</span><br><span class="line">| base                | <span class="number">30.54</span> | <span class="number">42.64</span> |</span><br><span class="line">| box                 | <span class="number">24.21</span> | <span class="number">29.27</span> |</span><br><span class="line">| column              | <span class="number">43.06</span> | <span class="number">53.74</span> |</span><br><span class="line">| signboard           | <span class="number">36.02</span> | <span class="number">48.73</span> |</span><br><span class="line">| chest of drawers    | <span class="number">39.78</span> | <span class="number">55.26</span> |</span><br><span class="line">| counter             | <span class="number">24.38</span> | <span class="number">34.5</span>  |</span><br><span class="line">| sand                | <span class="number">49.0</span>  | <span class="number">61.36</span> |</span><br><span class="line">| sink                | <span class="number">72.87</span> | <span class="number">79.28</span> |</span><br><span class="line">| skyscraper          | <span class="number">55.51</span> | <span class="number">75.59</span> |</span><br><span class="line">| fireplace           | <span class="number">77.31</span> | <span class="number">86.69</span> |</span><br><span class="line">| refrigerator        | <span class="number">73.98</span> | <span class="number">85.11</span> |</span><br><span class="line">| grandstand          | <span class="number">36.52</span> | <span class="number">66.35</span> |</span><br><span class="line">| path                | <span class="number">25.78</span> | <span class="number">36.24</span> |</span><br><span class="line">| stairs              | <span class="number">30.06</span> | <span class="number">36.85</span> |</span><br><span class="line">| runway              | <span class="number">64.37</span> | <span class="number">86.92</span> |</span><br><span class="line">| case                | <span class="number">36.91</span> | <span class="number">47.58</span> |</span><br><span class="line">| pool table          | <span class="number">91.72</span> | <span class="number">95.42</span> |</span><br><span class="line">| pillow              | <span class="number">54.05</span> | <span class="number">61.68</span> |</span><br><span class="line">| screen door         | <span class="number">57.43</span> | <span class="number">76.01</span> |</span><br><span class="line">| stairway            | <span class="number">28.86</span> | <span class="number">37.94</span> |</span><br><span class="line">| river               | <span class="number">7.04</span>  | <span class="number">18.76</span> |</span><br><span class="line">| bridge              | <span class="number">33.95</span> | <span class="number">43.37</span> |</span><br><span class="line">| bookcase            | <span class="number">43.84</span> | <span class="number">63.89</span> |</span><br><span class="line">| blind               | <span class="number">42.74</span> | <span class="number">47.66</span> |</span><br><span class="line">| coffee table        | <span class="number">56.26</span> | <span class="number">80.03</span> |</span><br><span class="line">| toilet              | <span class="number">84.39</span> | <span class="number">91.65</span> |</span><br><span class="line">| flower              | <span class="number">41.4</span>  | <span class="number">57.24</span> |</span><br><span class="line">| book                | <span class="number">46.29</span> | <span class="number">63.28</span> |</span><br><span class="line">| hill                | <span class="number">6.21</span>  | <span class="number">10.59</span> |</span><br><span class="line">| bench               | <span class="number">50.84</span> | <span class="number">58.05</span> |</span><br><span class="line">| countertop          | <span class="number">47.47</span> | <span class="number">65.09</span> |</span><br><span class="line">| stove               | <span class="number">77.27</span> | <span class="number">82.83</span> |</span><br><span class="line">| palm                | <span class="number">49.09</span> | <span class="number">80.35</span> |</span><br><span class="line">| kitchen island      | <span class="number">35.46</span> | <span class="number">66.41</span> |</span><br><span class="line">| computer            | <span class="number">60.62</span> | <span class="number">69.92</span> |</span><br><span class="line">| swivel chair        | <span class="number">43.89</span> | <span class="number">58.2</span>  |</span><br><span class="line">| boat                | <span class="number">44.83</span> | <span class="number">51.58</span> |</span><br><span class="line">| bar                 | <span class="number">33.78</span> | <span class="number">46.42</span> |</span><br><span class="line">| arcade machine      | <span class="number">42.46</span> | <span class="number">45.03</span> |</span><br><span class="line">| hovel               | <span class="number">27.84</span> | <span class="number">33.58</span> |</span><br><span class="line">| bus                 | <span class="number">85.5</span>  | <span class="number">95.7</span>  |</span><br><span class="line">| towel               | <span class="number">64.81</span> | <span class="number">77.75</span> |</span><br><span class="line">| light               | <span class="number">51.2</span>  | <span class="number">57.51</span> |</span><br><span class="line">| truck               | <span class="number">38.52</span> | <span class="number">49.88</span> |</span><br><span class="line">| tower               | <span class="number">12.59</span> | <span class="number">16.34</span> |</span><br><span class="line">| chandelier          | <span class="number">67.62</span> | <span class="number">83.59</span> |</span><br><span class="line">| awning              | <span class="number">24.46</span> | <span class="number">29.84</span> |</span><br><span class="line">| streetlight         | <span class="number">22.69</span> | <span class="number">27.9</span>  |</span><br><span class="line">| booth               | <span class="number">39.14</span> | <span class="number">43.55</span> |</span><br><span class="line">| television receiver | <span class="number">63.52</span> | <span class="number">76.73</span> |</span><br><span class="line">| airplane            | <span class="number">54.17</span> | <span class="number">68.22</span> |</span><br><span class="line">| dirt track          | <span class="number">9.49</span>  | <span class="number">20.3</span>  |</span><br><span class="line">| apparel             | <span class="number">41.61</span> | <span class="number">58.49</span> |</span><br><span class="line">| pole                | <span class="number">22.26</span> | <span class="number">31.02</span> |</span><br><span class="line">| land                | <span class="number">3.74</span>  | <span class="number">5.16</span>  |</span><br><span class="line">| bannister           | <span class="number">9.37</span>  | <span class="number">11.57</span> |</span><br><span class="line">| escalator           | <span class="number">46.01</span> | <span class="number">61.15</span> |</span><br><span class="line">| ottoman             | <span class="number">46.64</span> | <span class="number">61.2</span>  |</span><br><span class="line">| bottle              | <span class="number">39.34</span> | <span class="number">59.83</span> |</span><br><span class="line">| buffet              | <span class="number">29.0</span>  | <span class="number">32.67</span> |</span><br><span class="line">| poster              | <span class="number">26.59</span> | <span class="number">36.56</span> |</span><br><span class="line">| stage               | <span class="number">19.5</span>  | <span class="number">30.8</span>  |</span><br><span class="line">| van                 | <span class="number">42.08</span> | <span class="number">56.7</span>  |</span><br><span class="line">| ship                | <span class="number">31.27</span> | <span class="number">47.3</span>  |</span><br><span class="line">| fountain            | <span class="number">21.48</span> | <span class="number">22.08</span> |</span><br><span class="line">| conveyer belt       | <span class="number">56.6</span>  | <span class="number">69.16</span> |</span><br><span class="line">| canopy              | <span class="number">6.03</span>  | <span class="number">9.86</span>  |</span><br><span class="line">| washer              | <span class="number">74.13</span> | <span class="number">76.94</span> |</span><br><span class="line">| plaything           | <span class="number">22.11</span> | <span class="number">33.75</span> |</span><br><span class="line">| swimming pool       | <span class="number">57.93</span> | <span class="number">75.19</span> |</span><br><span class="line">| stool               | <span class="number">36.61</span> | <span class="number">54.75</span> |</span><br><span class="line">| barrel              | <span class="number">38.85</span> | <span class="number">65.2</span>  |</span><br><span class="line">| basket              | <span class="number">29.85</span> | <span class="number">39.16</span> |</span><br><span class="line">| waterfall           | <span class="number">61.86</span> | <span class="number">71.23</span> |</span><br><span class="line">| tent                | <span class="number">91.31</span> | <span class="number">98.67</span> |</span><br><span class="line">| bag                 | <span class="number">14.61</span> | <span class="number">18.94</span> |</span><br><span class="line">| minibike            | <span class="number">70.54</span> | <span class="number">82.9</span>  |</span><br><span class="line">| cradle              | <span class="number">69.39</span> | <span class="number">84.86</span> |</span><br><span class="line">| oven                | <span class="number">59.75</span> | <span class="number">75.28</span> |</span><br><span class="line">| ball                | <span class="number">39.28</span> | <span class="number">49.13</span> |</span><br><span class="line">| food                | <span class="number">44.82</span> | <span class="number">55.14</span> |</span><br><span class="line">| step                | <span class="number">15.71</span> | <span class="number">19.1</span>  |</span><br><span class="line">| tank                | <span class="number">56.6</span>  | <span class="number">59.83</span> |</span><br><span class="line">| trade name          | <span class="number">26.23</span> | <span class="number">30.57</span> |</span><br><span class="line">| microwave           | <span class="number">84.77</span> | <span class="number">92.18</span> |</span><br><span class="line">| pot                 | <span class="number">43.37</span> | <span class="number">50.01</span> |</span><br><span class="line">| animal              | <span class="number">50.4</span>  | <span class="number">52.17</span> |</span><br><span class="line">| bicycle             | <span class="number">55.69</span> | <span class="number">76.24</span> |</span><br><span class="line">| lake                | <span class="number">42.86</span> | <span class="number">64.07</span> |</span><br><span class="line">| dishwasher          | <span class="number">62.77</span> | <span class="number">69.52</span> |</span><br><span class="line">| screen              | <span class="number">56.03</span> | <span class="number">74.51</span> |</span><br><span class="line">| blanket             | <span class="number">9.13</span>  | <span class="number">10.76</span> |</span><br><span class="line">| sculpture           | <span class="number">53.36</span> | <span class="number">74.64</span> |</span><br><span class="line">| hood                | <span class="number">58.87</span> | <span class="number">69.21</span> |</span><br><span class="line">| sconce              | <span class="number">43.44</span> | <span class="number">52.69</span> |</span><br><span class="line">| vase                | <span class="number">32.91</span> | <span class="number">42.82</span> |</span><br><span class="line">| traffic light       | <span class="number">28.49</span> | <span class="number">40.94</span> |</span><br><span class="line">| tray                | <span class="number">9.37</span>  | <span class="number">12.05</span> |</span><br><span class="line">| ashcan              | <span class="number">39.81</span> | <span class="number">52.34</span> |</span><br><span class="line">| fan                 | <span class="number">60.07</span> | <span class="number">72.86</span> |</span><br><span class="line">| pier                | <span class="number">54.33</span> | <span class="number">84.51</span> |</span><br><span class="line">| crt screen          | <span class="number">5.25</span>  | <span class="number">16.89</span> |</span><br><span class="line">| plate               | <span class="number">45.0</span>  | <span class="number">57.68</span> |</span><br><span class="line">| monitor             | <span class="number">14.04</span> | <span class="number">19.48</span> |</span><br><span class="line">| bulletin board      | <span class="number">47.86</span> | <span class="number">55.79</span> |</span><br><span class="line">| shower              | <span class="number">0.45</span>  | <span class="number">0.7</span>   |</span><br><span class="line">| radiator            | <span class="number">51.47</span> | <span class="number">61.22</span> |</span><br><span class="line">| glass               | <span class="number">13.14</span> | <span class="number">14.29</span> |</span><br><span class="line">| clock               | <span class="number">31.41</span> | <span class="number">39.73</span> |</span><br><span class="line">| flag                | <span class="number">46.52</span> | <span class="number">50.16</span> |</span><br><span class="line">+---------------------+-------+-------+</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>deep learning</category>
+      </categories>
+      <tags>
+        <tag>semantic segmentation</tag>
       </tags>
   </entry>
 </search>
