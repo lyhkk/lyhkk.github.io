@@ -1,6 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Attention Is All You Need论文笔记</title>
+    <url>/2023/08/14/Attention%20Is%20All%20You%20Need%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p><a href="https://arxiv.org/abs/1706.03762">论文地址</a></p>
+<p><strong>Transformer</strong>:</p>
+<ol>
+<li><p>Attention有无限长上下文窗口，之前序列生成算法(LSTM, GPT2)的难点</p>
+</li>
+<li><p>Query: 类比Google输入框</p>
+<p>Key: Google根据Query为你匹配到的关键词</p>
+<p>Value: 查询到的网页</p>
+</li>
+<li><p>Encoder-Decoder结构:</p>
+<p>Encoder: 将文本序列变为带有注意力的向量表示</p>
+<p>Decoder: 生成序列</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046791.png" alt="image-20230813110607595"></p>
+</li>
+<li><p>模块化解读</p>
+<ol>
+<li><p>Input Embedding: 输入的symbol representation映射到continuous presentation(向量)</p>
+</li>
+<li><p>Positional Encoding: 将token的位置信息映射到向量（位置信息对语义的表达很关键）</p>
+<p>数学实现：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046792.png" alt="image-20230813210127612"></p>
+<p>1）d&lt;&#x3D;&gt;d<del>model</del>，和Input Embedding层输出的向量维度相同</p>
+<p>​      i的计算方法由下面的示例说明</p>
+<p>2）编码原则：唯一性，不同长度序列的token间间隔含义相同</p>
+<p>3）为什么不用index of token作为位置编码：For long sequences, the indices can grow large in magnitude. &#x3D;&#x3D;If you normalize the index value to lie between 0 and 1, it can create problems for variable length sequences as they would be normalized differently.&#x3D;&#x3D;这违背了一个位置编码的原则：对于不同长度的序列，token的间隔的含义要相同 –&gt; 最好编码完，得到的位置信息自然∈(0,1)</p>
+<p>4）Example:<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046793.png" alt="image-20230813210507196"></p>
+<blockquote>
+<p>i的计算方法：0≤i&lt;d&#x2F;2&#x3D;2，4维的positional encoding的index&#x3D;0,1,2,3，index为奇数，2i+1&#x3D;index，index为偶数，2i&#x3D;index。上图的index对应得出i的取值0,0,1,1</p>
+<p>根据示例分析是否符合编码原则：</p>
+<ol>
+<li>位置编码向量是否唯一：看上图矩阵第一列，编码始终为sin(2i+1)或cos(2i) (i∈N)，根据对称性，因为sin和cos对称轴始终不在自然数上，所以不可能有相同的，满足唯一性</li>
+<li>不同长度的序列，token之间的间隔的含义要相同，因为这种方式产生的编码自然在(0,1)区间，不需要normalization。这里的不同长度序列，它们的(n, i, d)这个三元组取值都相同，只是k的范围不同，那么token的间隔始终相同</li>
+</ol>
+</blockquote>
+</li>
+<li><p><strong>Multi-Head Attention:</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046794.png" alt="image-20230813110533123"></p>
+<blockquote>
+<p>h for “Head” num</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046795.png" alt="image-20230813111743464"></p>
+<p>Q, K, V都是d<del>model</del>列</p>
+<p>W<del>i</del>是weight矩阵，d<del>model</del> &#x3D; n<del>head</del> * d<del>k</del></p>
+</blockquote>
+<ol>
+<li><p>代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MultiHeadAttention</span>(nn.Module):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27; Multi-Head Attention module &#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n_head, d_model, d_k, d_v, dropout=<span class="number">0.1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line"></span><br><span class="line">        self.n_head = n_head</span><br><span class="line">        self.d_k = d_k</span><br><span class="line">        self.d_v = d_v</span><br><span class="line"></span><br><span class="line">        self.w_qs = nn.Linear(d_model, n_head * d_k, bias=<span class="literal">False</span>)</span><br><span class="line">        self.w_ks = nn.Linear(d_model, n_head * d_k, bias=<span class="literal">False</span>)</span><br><span class="line">        self.w_vs = nn.Linear(d_model, n_head * d_v, bias=<span class="literal">False</span>)</span><br><span class="line">        self.fc = nn.Linear(n_head * d_v, d_model, bias=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">        self.attention = ScaledDotProductAttention(temperature=d_k ** <span class="number">0.5</span>)</span><br><span class="line"></span><br><span class="line">        self.dropout = nn.Dropout(dropout)</span><br><span class="line">        self.layer_norm = nn.LayerNorm(d_model, eps=<span class="number">1e-6</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, q, k, v, mask=<span class="literal">None</span></span>):</span><br><span class="line"></span><br><span class="line">        d_k, d_v, n_head = self.d_k, self.d_v, self.n_head</span><br><span class="line">        sz_b, len_q, len_k, len_v = q.size(<span class="number">0</span>), q.size(<span class="number">1</span>), k.size(<span class="number">1</span>), v.size(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        residual = q</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Pass through the pre-attention projection: b x lq x (n*dv)</span></span><br><span class="line">        <span class="comment"># Separate different heads: b x lq x n x dv</span></span><br><span class="line">        q = self.w_qs(q).view(sz_b, len_q, n_head, d_k)</span><br><span class="line">        k = self.w_ks(k).view(sz_b, len_k, n_head, d_k)</span><br><span class="line">        v = self.w_vs(v).view(sz_b, len_v, n_head, d_v)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Transpose for attention dot product: b x n x lq x dv</span></span><br><span class="line">        q, k, v = q.transpose(<span class="number">1</span>, <span class="number">2</span>), k.transpose(<span class="number">1</span>, <span class="number">2</span>), v.transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            mask = mask.unsqueeze(<span class="number">1</span>)   <span class="comment"># For head axis broadcasting.</span></span><br><span class="line"></span><br><span class="line">        q, attn = self.attention(q, k, v, mask=mask)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Transpose to move the head dimension back: b x lq x n x dv</span></span><br><span class="line">        <span class="comment"># Combine the last two dimensions to concatenate all the heads together: b x lq x (n*dv)</span></span><br><span class="line">        q = q.transpose(<span class="number">1</span>, <span class="number">2</span>).contiguous().view(sz_b, len_q, -<span class="number">1</span>)</span><br><span class="line">        q = self.dropout(self.fc(q))</span><br><span class="line">        q += residual</span><br><span class="line"></span><br><span class="line">        q = self.layer_norm(q)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> q, attn <span class="comment"># 返回输出和attention</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>len_q, len_k, len_v对应论文中的d<del>model</del>，并且相等</p>
+</blockquote>
+</li>
+<li><p><strong>Scaled Dot-Product Attention:</strong></p>
+<ol>
+<li><p>比较Query和Key相似度-&gt;softmax-&gt;对Value加权</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046796.png" alt="image-20230813004534001"></p>
+<blockquote>
+<p>为什么要Scale: 论文原文：We suspect that for large values of d<del>k</del>, the dot products grow large in magnitude, pushing the softmax function into regions where it has <strong>extremely small gradients</strong></p>
+<ol>
+<li>由于softmax函数计算方法使用了指数函数，如果d<del>k</del>大了，参与QK^T^点乘的元素个数增加，产生的矩阵，各个位置的值大概率变大，反向传播时，梯度极小</li>
+<li>指数函数可能存在数值的上溢和下溢问题</li>
+</ol>
+<p>Mask矩阵: Mask是一个bool型矩阵。在第 i 时刻做注意力计算时，&gt;i 的时刻都没有结果，只有＜i 的时刻有结果。注意力只与之前的内容相关，因此需要做Mask，将QK^T^点乘产生的矩阵中，在Mask规定的需要掩住的位置上，将结果矩阵值设为-1e9，经过softmax后就是0</p>
+</blockquote>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308131104219.png" alt="image-20230813004024882"></p>
+</li>
+<li><p>代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ScaledDotProductAttention</span>(nn.Module):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27; Scaled Dot-Product Attention &#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, temperature, attn_dropout=<span class="number">0.1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.temperature = temperature  <span class="comment"># 1/sqrt(d_k)</span></span><br><span class="line">        self.dropout = nn.Dropout(attn_dropout)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, q, k, v, mask=<span class="literal">None</span></span>):</span><br><span class="line"></span><br><span class="line">        attn = torch.matmul(q / self.temperature, k.transpose(<span class="number">2</span>, <span class="number">3</span>))</span><br><span class="line">        <span class="comment"># mask --&gt; 只能通过现有的output序列生成新的序列</span></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>: </span><br><span class="line">            attn = attn.masked_fill(mask == <span class="number">0</span>, -<span class="number">1e9</span>)</span><br><span class="line"></span><br><span class="line">        attn = self.dropout(F.softmax(attn, dim=-<span class="number">1</span>)) <span class="comment"># dropout应该也是option ?</span></span><br><span class="line">        output = torch.matmul(attn, v)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> output, attn</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>Decoder:</p>
+<ol>
+<li><p>搞清三个输入箭头：</p>
+<ol>
+<li>Outputs(shifted right): 将生成的序列作为输入</li>
+<li>将Encoder输出的Attention向量作为第二个Multi-Head Attention的Attention</li>
+</ol>
+</li>
+<li><p>为什么要用Masked Multi-Head Attention</p>
+<ol>
+<li><p>因为这是对生成序列进行Attention，而每一时刻生成的序列，只能与之前生成的序列关联</p>
+</li>
+<li><p>如何进行mask:</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046797.png" alt="image-20230814005832316"></p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>deep learning</category>
+      </categories>
+      <tags>
+        <tag>transformer</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C++ STL</title>
     <url>/2023/07/05/C-STL/</url>
     <content><![CDATA[<h2 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h2><ol>
@@ -132,97 +236,82 @@
       </tags>
   </entry>
   <entry>
-    <title>Attention Is All You Need论文笔记</title>
-    <url>/2023/08/14/Attention%20Is%20All%20You%20Need%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p><a href="https://arxiv.org/abs/1706.03762">论文地址</a></p>
-<p><strong>Transformer</strong>:</p>
+    <title>Swin-Transformer-V1论文笔记</title>
+    <url>/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p><a href="https://arxiv.org/abs/2103.14030">paper</a></p>
+<p><strong>Swin-Transformer-V1网络结构：</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147454.png" alt="image-20230814090947639"></p>
+<p><strong>不同参数量级的Swin的设置：</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147455.png" alt="image-20230814095932385"></p>
+<p><strong>网络结构解读：</strong></p>
 <ol>
-<li><p>Attention有无限长上下文窗口，之前序列生成算法(LSTM, GPT2)的难点</p>
+<li><p>Patch Partition: 为每一个图片分为不同patch</p>
 </li>
-<li><p>Query: 类比Google输入框</p>
-<p>Key: Google根据Query为你匹配到的关键词</p>
-<p>Value: 查询到的网页</p>
+<li><p>Linear Embedding: 用于Stage 1: 将通道数48映射到任意的C，很像序列attention的第一步：将符号信息-&gt;向量</p>
 </li>
-<li><p>Encoder-Decoder结构:</p>
-<p>Encoder: 将文本序列变为带有注意力的向量表示</p>
-<p>Decoder: 生成序列</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046791.png" alt="image-20230813110607595"></p>
+<li><p>Patch merging: 降采样，比如stage2: merging的作法是，将feature map切patch，为[H&#x2F;8, W&#x2F;8]，channel维变为4C，[B, H&#x2F;8, W&#x2F;8, 4C]再通过一个线性层将4C映射到2C</p>
 </li>
-<li><p>模块化解读</p>
-<ol>
-<li><p>Input Embedding: 输入的symbol representation映射到continuous presentation(向量)</p>
+<li><p>Window partition: 将<code>(B,H,W,C)</code>的图片划分为<code>(num_windows*B, window_size, window_size, C)</code></p>
 </li>
-<li><p>Positional Encoding: 将token的位置信息映射到向量（位置信息对语义的表达很关键）</p>
-<p>数学实现：</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046792.png" alt="image-20230813210127612"></p>
-<p>1）d&lt;&#x3D;&gt;d<del>model</del>，和Input Embedding层输出的向量维度相同</p>
-<p>​      i的计算方法由下面的示例说明</p>
-<p>2）编码原则：唯一性，不同长度序列的token间间隔含义相同</p>
-<p>3）为什么不用index of token作为位置编码：For long sequences, the indices can grow large in magnitude. &#x3D;&#x3D;If you normalize the index value to lie between 0 and 1, it can create problems for variable length sequences as they would be normalized differently.&#x3D;&#x3D;这违背了一个位置编码的原则：对于不同长度的序列，token的间隔的含义要相同 –&gt; 最好编码完，得到的位置信息自然∈(0,1)</p>
-<p>4）Example:<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046793.png" alt="image-20230813210507196"></p>
+<li><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">Window Partition</th>
+<th align="center">computation skills</th>
+<th align="center">context</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">W-MSA</td>
+<td align="center">regular</td>
+<td align="center">–</td>
+<td align="center">only window</td>
+</tr>
+<tr>
+<td align="center">SW-MSA</td>
+<td align="center">shifted</td>
+<td align="center">cyclic shift</td>
+<td align="center">only window</td>
+</tr>
+<tr>
+<td align="center">MSA</td>
+<td align="center">regular</td>
+<td align="center">–</td>
+<td align="center">global</td>
+</tr>
+</tbody></table>
 <blockquote>
-<p>i的计算方法：0≤i&lt;d&#x2F;2&#x3D;2，4维的positional encoding的index&#x3D;0,1,2,3，index为奇数，2i+1&#x3D;index，index为偶数，2i&#x3D;index。上图的index对应得出i的取值0,0,1,1</p>
-<p>根据示例分析是否符合编码原则：</p>
-<ol>
-<li>位置编码向量是否唯一：看上图矩阵第一列，编码始终为sin(2i+1)或cos(2i) (i∈N)，根据对称性，因为sin和cos对称轴始终不在自然数上，所以不可能有相同的，满足唯一性</li>
-<li>不同长度的序列，token之间的间隔的含义要相同，因为这种方式产生的编码自然在(0,1)区间，不需要normalization。这里的不同长度序列，它们的(n, i, d)这个三元组取值都相同，只是k的范围不同，那么token的间隔始终相同</li>
-</ol>
+<p>Layer l - regular partition                                   Layer l+1 - shifted partition</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147457.png" alt="image-20230814092813118"></p>
+<p>shifted window <em>Pros</em>   克服了窗口间缺乏connections的弱点</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147458.png" alt="image-20230814093001309"></p>
+<p>无计算技巧时的shifted window计算量：</p>
+<p>以Figure 2为例：regular计算量是2×2的窗口数。而shifted如果不用cyclic技巧，就需要加Pad，将所有窗口都变为4×4Patch的窗口大小，再计算，所以计算量就是3×3的窗口数，计算量×2.25</p>
+<p><code>Cyclic shift computation skill</code>: 只用4 windows的计算量，得到9 windows的self-attention结果</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147459.png" alt="image-20230814094808828"></p>
+<p>这样的话计算量还是2×2的窗口数，而且加入了窗口间的connection</p>
+<p><code>masked MSA</code>: 先明确<code>window-based self-attention</code>机制是窗口内部j计算attention，按照<code>shifted window partition</code>的分割方法，例：A模块即使被<code>cyclic shift</code>到图像的下方，也只能和A的转置进行计算attention，不然如果A是天空，灰色部分是地面，shift后A矩阵和灰色部分的矩阵的点乘得到的结果是不合理的，故计算的时候需要<code>mask</code>，负责遮住A与非A部分的矩阵点乘结果。这也符合我们对<code>computation skill</code>的理解，加入了<code>cyclic shift</code>的<code>SW-MSA</code>与<code>有pad的W-MSA</code>计算的attention结果相同</p>
+<p><code>reverse cyclic shift</code>: 将A,B,C复位</p>
 </blockquote>
 </li>
-<li><p><strong>Multi-Head Attention:</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046794.png" alt="image-20230813110533123"></p>
-<blockquote>
-<p>h for “Head” num</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046795.png" alt="image-20230813111743464"></p>
-<p>Q, K, V都是d<del>model</del>列</p>
-<p>W<del>i</del>是weight矩阵，d<del>model</del> &#x3D; n<del>head</del> * d<del>k</del></p>
-</blockquote>
+<li><p>Relative position bias</p>
 <ol>
-<li><p>代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MultiHeadAttention</span>(nn.Module):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27; Multi-Head Attention module &#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n_head, d_model, d_k, d_v, dropout=<span class="number">0.1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line"></span><br><span class="line">        self.n_head = n_head</span><br><span class="line">        self.d_k = d_k</span><br><span class="line">        self.d_v = d_v</span><br><span class="line"></span><br><span class="line">        self.w_qs = nn.Linear(d_model, n_head * d_k, bias=<span class="literal">False</span>)</span><br><span class="line">        self.w_ks = nn.Linear(d_model, n_head * d_k, bias=<span class="literal">False</span>)</span><br><span class="line">        self.w_vs = nn.Linear(d_model, n_head * d_v, bias=<span class="literal">False</span>)</span><br><span class="line">        self.fc = nn.Linear(n_head * d_v, d_model, bias=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">        self.attention = ScaledDotProductAttention(temperature=d_k ** <span class="number">0.5</span>)</span><br><span class="line"></span><br><span class="line">        self.dropout = nn.Dropout(dropout)</span><br><span class="line">        self.layer_norm = nn.LayerNorm(d_model, eps=<span class="number">1e-6</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, q, k, v, mask=<span class="literal">None</span></span>):</span><br><span class="line"></span><br><span class="line">        d_k, d_v, n_head = self.d_k, self.d_v, self.n_head</span><br><span class="line">        sz_b, len_q, len_k, len_v = q.size(<span class="number">0</span>), q.size(<span class="number">1</span>), k.size(<span class="number">1</span>), v.size(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        residual = q</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Pass through the pre-attention projection: b x lq x (n*dv)</span></span><br><span class="line">        <span class="comment"># Separate different heads: b x lq x n x dv</span></span><br><span class="line">        q = self.w_qs(q).view(sz_b, len_q, n_head, d_k)</span><br><span class="line">        k = self.w_ks(k).view(sz_b, len_k, n_head, d_k)</span><br><span class="line">        v = self.w_vs(v).view(sz_b, len_v, n_head, d_v)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Transpose for attention dot product: b x n x lq x dv</span></span><br><span class="line">        q, k, v = q.transpose(<span class="number">1</span>, <span class="number">2</span>), k.transpose(<span class="number">1</span>, <span class="number">2</span>), v.transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            mask = mask.unsqueeze(<span class="number">1</span>)   <span class="comment"># For head axis broadcasting.</span></span><br><span class="line"></span><br><span class="line">        q, attn = self.attention(q, k, v, mask=mask)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Transpose to move the head dimension back: b x lq x n x dv</span></span><br><span class="line">        <span class="comment"># Combine the last two dimensions to concatenate all the heads together: b x lq x (n*dv)</span></span><br><span class="line">        q = q.transpose(<span class="number">1</span>, <span class="number">2</span>).contiguous().view(sz_b, len_q, -<span class="number">1</span>)</span><br><span class="line">        q = self.dropout(self.fc(q))</span><br><span class="line">        q += residual</span><br><span class="line"></span><br><span class="line">        q = self.layer_norm(q)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> q, attn <span class="comment"># 返回输出和attention</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<li><p>修改后的Attention(Q,K,V)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147460.png" alt="image-20230816110225146"></p>
+<blockquote>
+<p>B是[M^2^, M^2^]大小的矩阵</p>
+</blockquote>
+</li>
+<li><p>给一个Window的不同位置的patch加一个位置编码（<a href="https://zhuanlan.zhihu.com/p/507105020">reference blog</a>）</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147461.png" alt="image-20230816110001915"></p>
+<blockquote>
+<p>拉成1维合并后 + M-1 -&gt; 索引非负</p>
+<p>行标×(2M-1) 可以区分开关于主对角线对称的位置，并且对结果加和，区间为[0,8]，这个结果可以作为<code>relative_position_bias_table</code>的索引</p>
+<p>table怎么计算：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">relative_position_bias_table = nn.Parameter(torch.zeros((<span class="number">2</span> * window_size[<span class="number">0</span>] - <span class="number">1</span>) * (<span class="number">2</span> * window_size[<span class="number">1</span>] - <span class="number">1</span>)))</span><br><span class="line">trunc_normal_(relative_position_bias_table, std=<span class="number">.02</span>) <span class="comment"># 正态分布应该是为了控制相对位置编码在(-1, 1)之间，位置编码的原则可以看我Attention is all you need的论文笔记</span></span><br></pre></td></tr></table></figure>
 
-<blockquote>
-<p>len_q, len_k, len_v对应论文中的d<del>model</del>，并且相等</p>
 </blockquote>
-</li>
-<li><p><strong>Scaled Dot-Product Attention:</strong></p>
-<ol>
-<li><p>比较Query和Key相似度-&gt;softmax-&gt;对Value加权</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046796.png" alt="image-20230813004534001"></p>
-<blockquote>
-<p>为什么要Scale: 论文原文：We suspect that for large values of d<del>k</del>, the dot products grow large in magnitude, pushing the softmax function into regions where it has <strong>extremely small gradients</strong></p>
-<ol>
-<li>由于softmax函数计算方法使用了指数函数，如果d<del>k</del>大了，参与QK^T^点乘的元素个数增加，产生的矩阵，各个位置的值大概率变大，反向传播时，梯度极小</li>
-<li>指数函数可能存在数值的上溢和下溢问题</li>
-</ol>
-<p>Mask矩阵: Mask是一个bool型矩阵。在第 i 时刻做注意力计算时，&gt;i 的时刻都没有结果，只有＜i 的时刻有结果。注意力只与之前的内容相关，因此需要做Mask，将QK^T^点乘产生的矩阵中，在Mask规定的需要掩住的位置上，将结果矩阵值设为-1e9，经过softmax后就是0</p>
-</blockquote>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308131104219.png" alt="image-20230813004024882"></p>
-</li>
-<li><p>代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ScaledDotProductAttention</span>(nn.Module):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27; Scaled Dot-Product Attention &#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, temperature, attn_dropout=<span class="number">0.1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.temperature = temperature  <span class="comment"># 1/sqrt(d_k)</span></span><br><span class="line">        self.dropout = nn.Dropout(attn_dropout)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, q, k, v, mask=<span class="literal">None</span></span>):</span><br><span class="line"></span><br><span class="line">        attn = torch.matmul(q / self.temperature, k.transpose(<span class="number">2</span>, <span class="number">3</span>))</span><br><span class="line">        <span class="comment"># mask --&gt; 只能通过现有的output序列生成新的序列</span></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>: </span><br><span class="line">            attn = attn.masked_fill(mask == <span class="number">0</span>, -<span class="number">1e9</span>)</span><br><span class="line"></span><br><span class="line">        attn = self.dropout(F.softmax(attn, dim=-<span class="number">1</span>)) <span class="comment"># dropout应该也是option ?</span></span><br><span class="line">        output = torch.matmul(attn, v)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> output, attn</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>Decoder:</p>
-<ol>
-<li><p>搞清三个输入箭头：</p>
-<ol>
-<li>Outputs(shifted right): 将生成的序列作为输入</li>
-<li>将Encoder输出的Attention向量作为第二个Multi-Head Attention的Attention</li>
-</ol>
-</li>
-<li><p>为什么要用Masked Multi-Head Attention</p>
-<ol>
-<li><p>因为这是对生成序列进行Attention，而每一时刻生成的序列，只能与之前生成的序列关联</p>
-</li>
-<li><p>如何进行mask:</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046797.png" alt="image-20230814005832316"></p>
-</li>
-</ol>
-</li>
-</ol>
 </li>
 </ol>
 </li>
@@ -335,111 +424,6 @@
       </tags>
   </entry>
   <entry>
-    <title>跑通Swin-Transformer-V2语义分割任务</title>
-    <url>/2023/08/15/%E8%B7%91%E9%80%9ASwin-Transformer-V2%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/</url>
-    <content><![CDATA[<p><a href="https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation"><strong>github仓库地址</strong></a></p>
-<p><a href="">Swin-Transformer-V1博文地址</a></p>
-<p><img src="C:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20230815183609946.png" alt="image-20230815183609946"></p>
-]]></content>
-      <categories>
-        <category>deep learning</category>
-      </categories>
-      <tags>
-        <tag>semantic segmentation</tag>
-        <tag>configure environment</tag>
-        <tag>coding</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Swin-Transformer-V1论文笔记</title>
-    <url>/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p><a href="https://arxiv.org/abs/2103.14030">paper</a></p>
-<p><strong>Swin-Transformer-V1网络结构：</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147454.png" alt="image-20230814090947639"></p>
-<p><strong>不同参数量级的Swin的设置：</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147455.png" alt="image-20230814095932385"></p>
-<p><strong>网络结构解读：</strong></p>
-<ol>
-<li><p>Patch Partition: 为每一个图片分为不同patch</p>
-</li>
-<li><p>Linear Embedding: 用于Stage 1: 将通道数48映射到任意的C，很像序列attention的第一步：将符号信息-&gt;向量</p>
-</li>
-<li><p>Patch merging: 降采样，比如stage2: merging的作法是，将feature map切patch，为[H&#x2F;8, W&#x2F;8]，channel维变为4C，[B, H&#x2F;8, W&#x2F;8, 4C]再通过一个线性层将4C映射到2C</p>
-</li>
-<li><p>Window partition: 将<code>(B,H,W,C)</code>的图片划分为<code>(num_windows*B, window_size, window_size, C)</code></p>
-</li>
-<li><table>
-<thead>
-<tr>
-<th align="center"></th>
-<th align="center">Window Partition</th>
-<th align="center">computation skills</th>
-<th align="center">context</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">W-MSA</td>
-<td align="center">regular</td>
-<td align="center">–</td>
-<td align="center">only window</td>
-</tr>
-<tr>
-<td align="center">SW-MSA</td>
-<td align="center">shifted</td>
-<td align="center">cyclic shift</td>
-<td align="center">only window</td>
-</tr>
-<tr>
-<td align="center">MSA</td>
-<td align="center">regular</td>
-<td align="center">–</td>
-<td align="center">global</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p>Layer l - regular partition                                   Layer l+1 - shifted partition</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147457.png" alt="image-20230814092813118"></p>
-<p>shifted window <em>Pros</em>   克服了窗口间缺乏connections的弱点</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147458.png" alt="image-20230814093001309"></p>
-<p>无计算技巧时的shifted window计算量：</p>
-<p>以Figure 2为例：regular计算量是2×2的窗口数。而shifted如果不用cyclic技巧，就需要加Pad，将所有窗口都变为4×4Patch的窗口大小，再计算，所以计算量就是3×3的窗口数，计算量×2.25</p>
-<p><code>Cyclic shift computation skill</code>: 只用4 windows的计算量，得到9 windows的self-attention结果</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147459.png" alt="image-20230814094808828"></p>
-<p>这样的话计算量还是2×2的窗口数，而且加入了窗口间的connection</p>
-<p><code>masked MSA</code>: 先明确<code>window-based self-attention</code>机制是窗口内部j计算attention，按照<code>shifted window partition</code>的分割方法，例：A模块即使被<code>cyclic shift</code>到图像的下方，也只能和A的转置进行计算attention，不然如果A是天空，灰色部分是地面，shift后A矩阵和灰色部分的矩阵的点乘得到的结果是不合理的，故计算的时候需要<code>mask</code>，负责遮住A与非A部分的矩阵点乘结果。这也符合我们对<code>computation skill</code>的理解，加入了<code>cyclic shift</code>的<code>SW-MSA</code>与<code>有pad的W-MSA</code>计算的attention结果相同</p>
-<p><code>reverse cyclic shift</code>: 将A,B,C复位</p>
-</blockquote>
-</li>
-<li><p>Relative position bias</p>
-<ol>
-<li><p>修改后的Attention(Q,K,V)</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147460.png" alt="image-20230816110225146"></p>
-<blockquote>
-<p>B是[M^2^, M^2^]大小的矩阵</p>
-</blockquote>
-</li>
-<li><p>给一个Window的不同位置的patch加一个位置编码（<a href="https://zhuanlan.zhihu.com/p/507105020">reference blog</a>）</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147461.png" alt="image-20230816110001915"></p>
-<blockquote>
-<p>拉成1维合并后 + M-1 -&gt; 索引非负</p>
-<p>行标×(2M-1) 可以区分开关于主对角线对称的位置，并且对结果加和，区间为[0,8]，这个结果可以作为<code>relative_position_bias_table</code>的索引</p>
-<p>table怎么计算：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">relative_position_bias_table = nn.Parameter(torch.zeros((<span class="number">2</span> * window_size[<span class="number">0</span>] - <span class="number">1</span>) * (<span class="number">2</span> * window_size[<span class="number">1</span>] - <span class="number">1</span>)))</span><br><span class="line">trunc_normal_(relative_position_bias_table, std=<span class="number">.02</span>) <span class="comment"># 正态分布应该是为了控制相对位置编码在(-1, 1)之间，位置编码的原则可以看我Attention is all you need的论文笔记</span></span><br></pre></td></tr></table></figure>
-
-</blockquote>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>deep learning</category>
-      </categories>
-      <tags>
-        <tag>transformer</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>跑通Swin-Transformer-V1语义分割任务</title>
     <url>/2023/08/10/%E8%B7%91%E9%80%9ASwin-Transformer-V1%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/</url>
     <content><![CDATA[<p><a href="https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation"><strong>github仓库地址</strong></a></p>
@@ -512,6 +496,84 @@
 <p><strong>附录：</strong></p>
 <p>validation过程中，各类别的mIoU和Acc如下：</p>
 <figure class="highlight json"><table><tr><td class="code"><pre><span class="line">+---------------------+-------+-------+</span><br><span class="line">| Class               | IoU   | Acc   |</span><br><span class="line">+---------------------+-------+-------+</span><br><span class="line">| wall                | <span class="number">75.88</span> | <span class="number">87.82</span> |</span><br><span class="line">| building            | <span class="number">81.5</span>  | <span class="number">91.98</span> |</span><br><span class="line">| sky                 | <span class="number">93.95</span> | <span class="number">97.18</span> |</span><br><span class="line">| floor               | <span class="number">80.19</span> | <span class="number">90.6</span>  |</span><br><span class="line">| tree                | <span class="number">74.04</span> | <span class="number">87.05</span> |</span><br><span class="line">| ceiling             | <span class="number">82.28</span> | <span class="number">90.21</span> |</span><br><span class="line">| road                | <span class="number">81.98</span> | <span class="number">89.34</span> |</span><br><span class="line">| bed                 | <span class="number">86.94</span> | <span class="number">95.45</span> |</span><br><span class="line">| windowpane          | <span class="number">60.9</span>  | <span class="number">77.16</span> |</span><br><span class="line">| grass               | <span class="number">67.34</span> | <span class="number">83.15</span> |</span><br><span class="line">| cabinet             | <span class="number">59.51</span> | <span class="number">72.18</span> |</span><br><span class="line">| sidewalk            | <span class="number">64.31</span> | <span class="number">80.8</span>  |</span><br><span class="line">| person              | <span class="number">78.34</span> | <span class="number">90.42</span> |</span><br><span class="line">| earth               | <span class="number">37.37</span> | <span class="number">52.52</span> |</span><br><span class="line">| door                | <span class="number">45.28</span> | <span class="number">59.92</span> |</span><br><span class="line">| table               | <span class="number">59.22</span> | <span class="number">76.1</span>  |</span><br><span class="line">| mountain            | <span class="number">57.24</span> | <span class="number">71.79</span> |</span><br><span class="line">| plant               | <span class="number">52.32</span> | <span class="number">63.37</span> |</span><br><span class="line">| curtain             | <span class="number">69.82</span> | <span class="number">83.09</span> |</span><br><span class="line">| chair               | <span class="number">54.96</span> | <span class="number">69.21</span> |</span><br><span class="line">| car                 | <span class="number">83.77</span> | <span class="number">91.67</span> |</span><br><span class="line">| water               | <span class="number">47.62</span> | <span class="number">61.96</span> |</span><br><span class="line">| painting            | <span class="number">72.41</span> | <span class="number">86.03</span> |</span><br><span class="line">| sofa                | <span class="number">60.08</span> | <span class="number">76.23</span> |</span><br><span class="line">| shelf               | <span class="number">43.32</span> | <span class="number">63.98</span> |</span><br><span class="line">| house               | <span class="number">49.56</span> | <span class="number">62.8</span>  |</span><br><span class="line">| sea                 | <span class="number">51.04</span> | <span class="number">70.59</span> |</span><br><span class="line">| mirror              | <span class="number">62.54</span> | <span class="number">69.18</span> |</span><br><span class="line">| rug                 | <span class="number">60.32</span> | <span class="number">67.46</span> |</span><br><span class="line">| field               | <span class="number">31.73</span> | <span class="number">45.61</span> |</span><br><span class="line">| armchair            | <span class="number">37.61</span> | <span class="number">57.33</span> |</span><br><span class="line">| seat                | <span class="number">59.81</span> | <span class="number">79.95</span> |</span><br><span class="line">| fence               | <span class="number">42.07</span> | <span class="number">56.82</span> |</span><br><span class="line">| desk                | <span class="number">49.49</span> | <span class="number">66.97</span> |</span><br><span class="line">| rock                | <span class="number">47.33</span> | <span class="number">73.48</span> |</span><br><span class="line">| wardrobe            | <span class="number">49.47</span> | <span class="number">68.13</span> |</span><br><span class="line">| lamp                | <span class="number">60.04</span> | <span class="number">71.42</span> |</span><br><span class="line">| bathtub             | <span class="number">75.56</span> | <span class="number">81.97</span> |</span><br><span class="line">| railing             | <span class="number">32.42</span> | <span class="number">47.61</span> |</span><br><span class="line">| cushion             | <span class="number">54.0</span>  | <span class="number">68.56</span> |</span><br><span class="line">| base                | <span class="number">30.54</span> | <span class="number">42.64</span> |</span><br><span class="line">| box                 | <span class="number">24.21</span> | <span class="number">29.27</span> |</span><br><span class="line">| column              | <span class="number">43.06</span> | <span class="number">53.74</span> |</span><br><span class="line">| signboard           | <span class="number">36.02</span> | <span class="number">48.73</span> |</span><br><span class="line">| chest of drawers    | <span class="number">39.78</span> | <span class="number">55.26</span> |</span><br><span class="line">| counter             | <span class="number">24.38</span> | <span class="number">34.5</span>  |</span><br><span class="line">| sand                | <span class="number">49.0</span>  | <span class="number">61.36</span> |</span><br><span class="line">| sink                | <span class="number">72.87</span> | <span class="number">79.28</span> |</span><br><span class="line">| skyscraper          | <span class="number">55.51</span> | <span class="number">75.59</span> |</span><br><span class="line">| fireplace           | <span class="number">77.31</span> | <span class="number">86.69</span> |</span><br><span class="line">| refrigerator        | <span class="number">73.98</span> | <span class="number">85.11</span> |</span><br><span class="line">| grandstand          | <span class="number">36.52</span> | <span class="number">66.35</span> |</span><br><span class="line">| path                | <span class="number">25.78</span> | <span class="number">36.24</span> |</span><br><span class="line">| stairs              | <span class="number">30.06</span> | <span class="number">36.85</span> |</span><br><span class="line">| runway              | <span class="number">64.37</span> | <span class="number">86.92</span> |</span><br><span class="line">| case                | <span class="number">36.91</span> | <span class="number">47.58</span> |</span><br><span class="line">| pool table          | <span class="number">91.72</span> | <span class="number">95.42</span> |</span><br><span class="line">| pillow              | <span class="number">54.05</span> | <span class="number">61.68</span> |</span><br><span class="line">| screen door         | <span class="number">57.43</span> | <span class="number">76.01</span> |</span><br><span class="line">| stairway            | <span class="number">28.86</span> | <span class="number">37.94</span> |</span><br><span class="line">| river               | <span class="number">7.04</span>  | <span class="number">18.76</span> |</span><br><span class="line">| bridge              | <span class="number">33.95</span> | <span class="number">43.37</span> |</span><br><span class="line">| bookcase            | <span class="number">43.84</span> | <span class="number">63.89</span> |</span><br><span class="line">| blind               | <span class="number">42.74</span> | <span class="number">47.66</span> |</span><br><span class="line">| coffee table        | <span class="number">56.26</span> | <span class="number">80.03</span> |</span><br><span class="line">| toilet              | <span class="number">84.39</span> | <span class="number">91.65</span> |</span><br><span class="line">| flower              | <span class="number">41.4</span>  | <span class="number">57.24</span> |</span><br><span class="line">| book                | <span class="number">46.29</span> | <span class="number">63.28</span> |</span><br><span class="line">| hill                | <span class="number">6.21</span>  | <span class="number">10.59</span> |</span><br><span class="line">| bench               | <span class="number">50.84</span> | <span class="number">58.05</span> |</span><br><span class="line">| countertop          | <span class="number">47.47</span> | <span class="number">65.09</span> |</span><br><span class="line">| stove               | <span class="number">77.27</span> | <span class="number">82.83</span> |</span><br><span class="line">| palm                | <span class="number">49.09</span> | <span class="number">80.35</span> |</span><br><span class="line">| kitchen island      | <span class="number">35.46</span> | <span class="number">66.41</span> |</span><br><span class="line">| computer            | <span class="number">60.62</span> | <span class="number">69.92</span> |</span><br><span class="line">| swivel chair        | <span class="number">43.89</span> | <span class="number">58.2</span>  |</span><br><span class="line">| boat                | <span class="number">44.83</span> | <span class="number">51.58</span> |</span><br><span class="line">| bar                 | <span class="number">33.78</span> | <span class="number">46.42</span> |</span><br><span class="line">| arcade machine      | <span class="number">42.46</span> | <span class="number">45.03</span> |</span><br><span class="line">| hovel               | <span class="number">27.84</span> | <span class="number">33.58</span> |</span><br><span class="line">| bus                 | <span class="number">85.5</span>  | <span class="number">95.7</span>  |</span><br><span class="line">| towel               | <span class="number">64.81</span> | <span class="number">77.75</span> |</span><br><span class="line">| light               | <span class="number">51.2</span>  | <span class="number">57.51</span> |</span><br><span class="line">| truck               | <span class="number">38.52</span> | <span class="number">49.88</span> |</span><br><span class="line">| tower               | <span class="number">12.59</span> | <span class="number">16.34</span> |</span><br><span class="line">| chandelier          | <span class="number">67.62</span> | <span class="number">83.59</span> |</span><br><span class="line">| awning              | <span class="number">24.46</span> | <span class="number">29.84</span> |</span><br><span class="line">| streetlight         | <span class="number">22.69</span> | <span class="number">27.9</span>  |</span><br><span class="line">| booth               | <span class="number">39.14</span> | <span class="number">43.55</span> |</span><br><span class="line">| television receiver | <span class="number">63.52</span> | <span class="number">76.73</span> |</span><br><span class="line">| airplane            | <span class="number">54.17</span> | <span class="number">68.22</span> |</span><br><span class="line">| dirt track          | <span class="number">9.49</span>  | <span class="number">20.3</span>  |</span><br><span class="line">| apparel             | <span class="number">41.61</span> | <span class="number">58.49</span> |</span><br><span class="line">| pole                | <span class="number">22.26</span> | <span class="number">31.02</span> |</span><br><span class="line">| land                | <span class="number">3.74</span>  | <span class="number">5.16</span>  |</span><br><span class="line">| bannister           | <span class="number">9.37</span>  | <span class="number">11.57</span> |</span><br><span class="line">| escalator           | <span class="number">46.01</span> | <span class="number">61.15</span> |</span><br><span class="line">| ottoman             | <span class="number">46.64</span> | <span class="number">61.2</span>  |</span><br><span class="line">| bottle              | <span class="number">39.34</span> | <span class="number">59.83</span> |</span><br><span class="line">| buffet              | <span class="number">29.0</span>  | <span class="number">32.67</span> |</span><br><span class="line">| poster              | <span class="number">26.59</span> | <span class="number">36.56</span> |</span><br><span class="line">| stage               | <span class="number">19.5</span>  | <span class="number">30.8</span>  |</span><br><span class="line">| van                 | <span class="number">42.08</span> | <span class="number">56.7</span>  |</span><br><span class="line">| ship                | <span class="number">31.27</span> | <span class="number">47.3</span>  |</span><br><span class="line">| fountain            | <span class="number">21.48</span> | <span class="number">22.08</span> |</span><br><span class="line">| conveyer belt       | <span class="number">56.6</span>  | <span class="number">69.16</span> |</span><br><span class="line">| canopy              | <span class="number">6.03</span>  | <span class="number">9.86</span>  |</span><br><span class="line">| washer              | <span class="number">74.13</span> | <span class="number">76.94</span> |</span><br><span class="line">| plaything           | <span class="number">22.11</span> | <span class="number">33.75</span> |</span><br><span class="line">| swimming pool       | <span class="number">57.93</span> | <span class="number">75.19</span> |</span><br><span class="line">| stool               | <span class="number">36.61</span> | <span class="number">54.75</span> |</span><br><span class="line">| barrel              | <span class="number">38.85</span> | <span class="number">65.2</span>  |</span><br><span class="line">| basket              | <span class="number">29.85</span> | <span class="number">39.16</span> |</span><br><span class="line">| waterfall           | <span class="number">61.86</span> | <span class="number">71.23</span> |</span><br><span class="line">| tent                | <span class="number">91.31</span> | <span class="number">98.67</span> |</span><br><span class="line">| bag                 | <span class="number">14.61</span> | <span class="number">18.94</span> |</span><br><span class="line">| minibike            | <span class="number">70.54</span> | <span class="number">82.9</span>  |</span><br><span class="line">| cradle              | <span class="number">69.39</span> | <span class="number">84.86</span> |</span><br><span class="line">| oven                | <span class="number">59.75</span> | <span class="number">75.28</span> |</span><br><span class="line">| ball                | <span class="number">39.28</span> | <span class="number">49.13</span> |</span><br><span class="line">| food                | <span class="number">44.82</span> | <span class="number">55.14</span> |</span><br><span class="line">| step                | <span class="number">15.71</span> | <span class="number">19.1</span>  |</span><br><span class="line">| tank                | <span class="number">56.6</span>  | <span class="number">59.83</span> |</span><br><span class="line">| trade name          | <span class="number">26.23</span> | <span class="number">30.57</span> |</span><br><span class="line">| microwave           | <span class="number">84.77</span> | <span class="number">92.18</span> |</span><br><span class="line">| pot                 | <span class="number">43.37</span> | <span class="number">50.01</span> |</span><br><span class="line">| animal              | <span class="number">50.4</span>  | <span class="number">52.17</span> |</span><br><span class="line">| bicycle             | <span class="number">55.69</span> | <span class="number">76.24</span> |</span><br><span class="line">| lake                | <span class="number">42.86</span> | <span class="number">64.07</span> |</span><br><span class="line">| dishwasher          | <span class="number">62.77</span> | <span class="number">69.52</span> |</span><br><span class="line">| screen              | <span class="number">56.03</span> | <span class="number">74.51</span> |</span><br><span class="line">| blanket             | <span class="number">9.13</span>  | <span class="number">10.76</span> |</span><br><span class="line">| sculpture           | <span class="number">53.36</span> | <span class="number">74.64</span> |</span><br><span class="line">| hood                | <span class="number">58.87</span> | <span class="number">69.21</span> |</span><br><span class="line">| sconce              | <span class="number">43.44</span> | <span class="number">52.69</span> |</span><br><span class="line">| vase                | <span class="number">32.91</span> | <span class="number">42.82</span> |</span><br><span class="line">| traffic light       | <span class="number">28.49</span> | <span class="number">40.94</span> |</span><br><span class="line">| tray                | <span class="number">9.37</span>  | <span class="number">12.05</span> |</span><br><span class="line">| ashcan              | <span class="number">39.81</span> | <span class="number">52.34</span> |</span><br><span class="line">| fan                 | <span class="number">60.07</span> | <span class="number">72.86</span> |</span><br><span class="line">| pier                | <span class="number">54.33</span> | <span class="number">84.51</span> |</span><br><span class="line">| crt screen          | <span class="number">5.25</span>  | <span class="number">16.89</span> |</span><br><span class="line">| plate               | <span class="number">45.0</span>  | <span class="number">57.68</span> |</span><br><span class="line">| monitor             | <span class="number">14.04</span> | <span class="number">19.48</span> |</span><br><span class="line">| bulletin board      | <span class="number">47.86</span> | <span class="number">55.79</span> |</span><br><span class="line">| shower              | <span class="number">0.45</span>  | <span class="number">0.7</span>   |</span><br><span class="line">| radiator            | <span class="number">51.47</span> | <span class="number">61.22</span> |</span><br><span class="line">| glass               | <span class="number">13.14</span> | <span class="number">14.29</span> |</span><br><span class="line">| clock               | <span class="number">31.41</span> | <span class="number">39.73</span> |</span><br><span class="line">| flag                | <span class="number">46.52</span> | <span class="number">50.16</span> |</span><br><span class="line">+---------------------+-------+-------+</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>deep learning</category>
+      </categories>
+      <tags>
+        <tag>semantic segmentation</tag>
+        <tag>configure environment</tag>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>跑通beit v1的语义分割任务</title>
+    <url>/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/</url>
+    <content><![CDATA[<p><a href="https://github.com/microsoft/unilm/tree/master">Github仓库地址</a></p>
+<p><strong>Configure the virtual environment</strong></p>
+<ol>
+<li><p>首先，要确保环境为<strong>cuda 11.0</strong>，cuda版本是为之后<code>mmcv-full 1.3.0</code>(包含所有的特性以及丰富的开箱即用的CPU 和<strong>CUDA 算子</strong>)安装做准备。<strong>显卡驱动版本</strong>要支持这个cuda版本（笔者使用腾讯云  V100 GPU云服务器，下图是GPU驱动和cuda版本）<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953127.png" alt="image-20230820040252534"></p>
+</li>
+<li><p><code>conda create</code>创建一个<code>Python 3.8</code>的虚拟环境，也是为<code>mmcv-full</code>安装做准备</p>
+</li>
+<li><p><code>pip install torch=1.7.1+cu110</code>：这是最优解，但一开始没有意识到，之后会详细解释。所以我的第二步是进入<code>unlim/beit</code>目录下<code>pip install -r requirements.txt</code></p>
+</li>
+<li><p>根据<code>unlim/beit/semantic_segmentation/README.md</code>的tutor安装mmcv-full, mmseg, timm, <strong>apex</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953129.png" alt="image-20230820040928616"></p>
+</li>
+<li><p>但这里安装到apex就出错了，由于pip在之前创建虚拟环境时已经更新至最新版<code>23.2.1</code>, <code>--global-option has already been deprecated</code>，并且显示<code>packaging</code>模块找不到。此时去Nvidia的apex官方仓库，找到了新的命令：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">git clone https://github.com/NVIDIA/apex</span><br><span class="line">cd apex</span><br><span class="line"><span class="comment"># if pip &gt;= 23.1 (ref: https://pip.pypa.io/en/stable/news/#v23-1) which supports multiple `--config-settings` with the same key... </span></span><br><span class="line">pip install -v --disable-pip-version-check --no-cache-<span class="built_in">dir</span> --no-build-isolation --config-settings <span class="string">&quot;--build-option=--cpp_ext&quot;</span> --config-settings <span class="string">&quot;--build-option=--cuda_ext&quot;</span> ./</span><br><span class="line"><span class="comment"># otherwise</span></span><br><span class="line">pip install -v --disable-pip-version-check --no-cache-<span class="built_in">dir</span> --no-build-isolation --<span class="keyword">global</span>-option=<span class="string">&quot;--cpp_ext&quot;</span> --<span class="keyword">global</span>-option=<span class="string">&quot;--cuda_ext&quot;</span></span><br><span class="line"><span class="comment"># only python</span></span><br><span class="line">pip install -v --disable-pip-version-check --no-build-isolation --no-cache-<span class="built_in">dir</span> ./</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>按照第一个命令，安装后import apex仍然会报错：<code>AttributeError: module &#39;torch.distributed&#39; has no attribute &#39;_all_gather_base&#39;</code>，这是因为torch版本低，但是torch&#x3D;&#x3D;1.7.1是实验要求不可更改，根据github apex<code>issue 1532</code>，要去找branch里的老版本apex –&gt; <code>apex-22.04-dev</code></p>
+</li>
+<li><p>再安装apex，又比较奇怪，这个版本的apex不支持<code>--config-settings</code>，但使用<code>--global-option</code>对应的命令是可以安装完整版的(cuda+cpp+python)，也不会报错<code>packaging module not found</code></p>
+<blockquote>
+<p>packaging module not found这个报错在<code>issue 1679</code>中讨论到了，并有<code>pull request 1680</code>，解决方案是在<code>pyproject.toml</code>中修改：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953130.png" alt="image-20230820091717667"></p>
+<p>以我之前安装的步骤，这样修改完，再安装apex，会报<code>torch not found</code>，我没有详细论证，但推测和torch 1.7.1有关，这也是接下来要说的</p>
+</blockquote>
+</li>
+<li><p>安装仍然有一个报错，就是关于torch的，因为<code>torch.version.cuda</code>的版本(10.2)和真正使用的cuda版本(11.0)不同，所以需要安装对应cuda版本的torch，我的方法是去<a href="https://download.pytorch.org/whl/torch_stable.html">pytorch官方</a>下载对应的<code>.whl</code>包，并pip安装，之后就可以安装了</p>
+</li>
+<li><p>接下来就是比较常规的内容：</p>
+<ol>
+<li>将<code>beit/semantic_segmentation/mmcv_custom</code>添加到环境变量，或者直接复制到对应虚拟环境的<code>site_packages</code>文件夹下，这是因为mmcv_custom调用apex，实现了<code>[&#39;IterBasedRunnerAmp&#39;,&#39;LayerDecayOptimizerConstructor&#39;, &#39;SETR_Resize&#39;, &#39;DistOptimizerHook&#39;, &#39;train_segmentor&#39;]</code>这些训练用的组件</li>
+<li>还有就是将<code>mmseg/core/evaluation/metrics.py</code>中的<code>np.float</code>改为<code>float</code>，因为不再支持<code>np.float</code></li>
+</ol>
+</li>
+<li><p>目前仍待解决的问题：</p>
+<ol>
+<li><p>直接运行报错<code>Invoked &#39;with amp.scale_loss&#39;, but internal Amp state has not been initialized</code>，根据apex官方给出的文档，，apex只需要三行代码就可以优雅地调用Amp</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953131.png" alt="image-20230820093253041"></p>
+<p>我们在<code>mmcv_custom/tran_api.py</code>找到了初始化的实现：这里有一个疑惑，为什么<code>cfg.optimizer_config.get(&quot;use_fp16&quot;, False)</code>下还要初始化Amp为混合精度(根据官方文档，<code>opt_level=&quot;O1&quot;</code>即为混合精度，而正因为<code>use_fp16==True</code>，才成为混合精度(乘法用<code>fp16</code>，加法用<code>fp32</code>，混合精度的好处是<strong>可使显存，训练时间大幅减少，但不明显损害训练精度</strong>)，这一点目前没搞懂。</p>
+<p>并且，从现有的10000 iterations看，训练过程中震荡很明显，速度很慢(160k iters训练预计使用4 days)，batch size也只能开到4(<code>32G显存 单卡</code>)，并不像真正使用了Amp加速训练，这也引出了第二个问题</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># use apex fp16 optimizer</span></span><br><span class="line"><span class="keyword">if</span> cfg.optimizer_config.get(<span class="string">&quot;type&quot;</span>, <span class="literal">None</span>) <span class="keyword">and</span> cfg.optimizer_config[<span class="string">&quot;type&quot;</span>] == <span class="string">&quot;DistOptimizerHook&quot;</span>:</span><br><span class="line">    <span class="keyword">if</span> cfg.optimizer_config.get(<span class="string">&quot;use_fp16&quot;</span>, <span class="literal">False</span>):</span><br><span class="line">        model, optimizer = apex.amp.initialize(</span><br><span class="line">            model.cuda(), optimizer, opt_level=<span class="string">&quot;O1&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> model.modules():</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">hasattr</span>(m, <span class="string">&quot;fp16_enabled&quot;</span>):</span><br><span class="line">                m.fp16_enabled = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>本实验<strong>是否</strong>真的能通过单GPU训练达到<strong>复现</strong>，因为apex工具包的内容全部关于分布式训练，而<strong>分布式训练核心在于将不同计算核心开不同的进程，增大并行量</strong>，单GPU使用分布式训练（目前我实验使用的方法，因为我感觉代码，尤其是mmcv_custom不容易与分布式训练脱钩）。使用<code>ps aux</code>命令查看进程信息：(<code>北京时间8/20 9:50</code>)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953132.png" alt="image-20230820094805062"><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953133.png" alt="image-20230820094732140"></p>
+<blockquote>
+<p>可以看出与多进程相关的任务很多，但真正在服务于训练的只有<code>PID 32444</code>的进程，所以分布式训练可能很难真正起作用，因为计算核心只有一个包括即使修复了第一个问题，可以使用混合精度，是否会真正性能提升也是未知数</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>deep learning</category>
+      </categories>
+      <tags>
+        <tag>transformer</tag>
+        <tag>configure environment</tag>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>跑通Swin-Transformer-V2语义分割任务</title>
+    <url>/2023/08/15/%E8%B7%91%E9%80%9ASwin-Transformer-V2%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/</url>
+    <content><![CDATA[<p><a href="https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation"><strong>github仓库地址</strong></a></p>
+<p><a href="">Swin-Transformer-V1博文地址</a></p>
+<p><img src="C:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20230815183609946.png" alt="image-20230815183609946"></p>
 ]]></content>
       <categories>
         <category>deep learning</category>

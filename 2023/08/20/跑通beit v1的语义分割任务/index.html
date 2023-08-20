@@ -20,28 +20,29 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="将Swin-Transformer的结构进行解读">
+  <meta name="description" content="使用Github上Microsoft的unilm仓库，跑通BEiT V1的语义分割任务，笔记重点在于配置环境不断找到解决方案的思路。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Swin-Transformer-V1论文笔记">
-<meta property="og:url" content="http://example.com/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:title" content="跑通beit v1的语义分割任务">
+<meta property="og:url" content="http://example.com/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/index.html">
 <meta property="og:site_name" content="Code×Life">
-<meta property="og:description" content="将Swin-Transformer的结构进行解读">
+<meta property="og:description" content="使用Github上Microsoft的unilm仓库，跑通BEiT V1的语义分割任务，笔记重点在于配置环境不断找到解决方案的思路。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147454.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147455.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147457.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147458.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147459.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147460.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147461.png">
-<meta property="article:published_time" content="2023-08-16T03:49:05.000Z">
-<meta property="article:modified_time" content="2023-08-19T19:49:52.925Z">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953127.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953129.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953130.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953131.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953132.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953133.png">
+<meta property="article:published_time" content="2023-08-19T19:54:35.000Z">
+<meta property="article:modified_time" content="2023-08-20T01:53:48.292Z">
 <meta property="article:author" content="lyhkk">
 <meta property="article:tag" content="transformer">
+<meta property="article:tag" content="configure environment">
+<meta property="article:tag" content="coding">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147454.png">
+<meta name="twitter:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953127.png">
 
-<link rel="canonical" href="http://example.com/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">
+<link rel="canonical" href="http://example.com/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/">
 
 
 <script id="page-configurations">
@@ -54,7 +55,7 @@
   };
 </script>
 
-  <title>Swin-Transformer-V1论文笔记 | Code×Life</title>
+  <title>跑通beit v1的语义分割任务 | Code×Life</title>
   
 
 
@@ -197,7 +198,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -210,7 +211,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Swin-Transformer-V1论文笔记
+          跑通beit v1的语义分割任务
         </h1>
 
         <div class="post-meta">
@@ -219,16 +220,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2023-08-16 11:49:05" itemprop="dateCreated datePublished" datetime="2023-08-16T11:49:05+08:00">2023-08-16</time>
+              <time title="创建时间：2023-08-20 03:54:35 / 修改时间：09:53:48" itemprop="dateCreated datePublished" datetime="2023-08-20T03:54:35+08:00">2023-08-20</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-20 03:49:52" itemprop="dateModified" datetime="2023-08-20T03:49:52+08:00">2023-08-20</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -247,7 +242,7 @@
               <span class="post-meta-item-text">阅读次数：</span>
               <span id="busuanzi_value_page_pv"></span>
             </span>
-            <div class="post-description">将Swin-Transformer的结构进行解读</div>
+            <div class="post-description">使用Github上Microsoft的unilm仓库，跑通BEiT V1的语义分割任务，笔记重点在于配置环境不断找到解决方案的思路。</div>
 
         </div>
       </header>
@@ -258,79 +253,50 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2103.14030">paper</a></p>
-<p><strong>Swin-Transformer-V1网络结构：</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147454.png" alt="image-20230814090947639"></p>
-<p><strong>不同参数量级的Swin的设置：</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147455.png" alt="image-20230814095932385"></p>
-<p><strong>网络结构解读：</strong></p>
+        <p><a target="_blank" rel="noopener" href="https://github.com/microsoft/unilm/tree/master">Github仓库地址</a></p>
+<p><strong>Configure the virtual environment</strong></p>
 <ol>
-<li><p>Patch Partition: 为每一个图片分为不同patch</p>
+<li><p>首先，要确保环境为<strong>cuda 11.0</strong>，cuda版本是为之后<code>mmcv-full 1.3.0</code>(包含所有的特性以及丰富的开箱即用的CPU 和<strong>CUDA 算子</strong>)安装做准备。<strong>显卡驱动版本</strong>要支持这个cuda版本（笔者使用腾讯云  V100 GPU云服务器，下图是GPU驱动和cuda版本）<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953127.png" alt="image-20230820040252534"></p>
 </li>
-<li><p>Linear Embedding: 用于Stage 1: 将通道数48映射到任意的C，很像序列attention的第一步：将符号信息-&gt;向量</p>
+<li><p><code>conda create</code>创建一个<code>Python 3.8</code>的虚拟环境，也是为<code>mmcv-full</code>安装做准备</p>
 </li>
-<li><p>Patch merging: 降采样，比如stage2: merging的作法是，将feature map切patch，为[H&#x2F;8, W&#x2F;8]，channel维变为4C，[B, H&#x2F;8, W&#x2F;8, 4C]再通过一个线性层将4C映射到2C</p>
+<li><p><code>pip install torch=1.7.1+cu110</code>：这是最优解，但一开始没有意识到，之后会详细解释。所以我的第二步是进入<code>unlim/beit</code>目录下<code>pip install -r requirements.txt</code></p>
 </li>
-<li><p>Window partition: 将<code>(B,H,W,C)</code>的图片划分为<code>(num_windows*B, window_size, window_size, C)</code></p>
+<li><p>根据<code>unlim/beit/semantic_segmentation/README.md</code>的tutor安装mmcv-full, mmseg, timm, <strong>apex</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953129.png" alt="image-20230820040928616"></p>
 </li>
-<li><table>
-<thead>
-<tr>
-<th align="center"></th>
-<th align="center">Window Partition</th>
-<th align="center">computation skills</th>
-<th align="center">context</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">W-MSA</td>
-<td align="center">regular</td>
-<td align="center">–</td>
-<td align="center">only window</td>
-</tr>
-<tr>
-<td align="center">SW-MSA</td>
-<td align="center">shifted</td>
-<td align="center">cyclic shift</td>
-<td align="center">only window</td>
-</tr>
-<tr>
-<td align="center">MSA</td>
-<td align="center">regular</td>
-<td align="center">–</td>
-<td align="center">global</td>
-</tr>
-</tbody></table>
+<li><p>但这里安装到apex就出错了，由于pip在之前创建虚拟环境时已经更新至最新版<code>23.2.1</code>, <code>--global-option has already been deprecated</code>，并且显示<code>packaging</code>模块找不到。此时去Nvidia的apex官方仓库，找到了新的命令：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/NVIDIA/apex</span><br><span class="line">cd apex</span><br><span class="line"><span class="comment"># if pip &gt;= 23.1 (ref: https://pip.pypa.io/en/stable/news/#v23-1) which supports multiple `--config-settings` with the same key... </span></span><br><span class="line">pip install -v --disable-pip-version-check --no-cache-<span class="built_in">dir</span> --no-build-isolation --config-settings <span class="string">&quot;--build-option=--cpp_ext&quot;</span> --config-settings <span class="string">&quot;--build-option=--cuda_ext&quot;</span> ./</span><br><span class="line"><span class="comment"># otherwise</span></span><br><span class="line">pip install -v --disable-pip-version-check --no-cache-<span class="built_in">dir</span> --no-build-isolation --<span class="keyword">global</span>-option=<span class="string">&quot;--cpp_ext&quot;</span> --<span class="keyword">global</span>-option=<span class="string">&quot;--cuda_ext&quot;</span></span><br><span class="line"><span class="comment"># only python</span></span><br><span class="line">pip install -v --disable-pip-version-check --no-build-isolation --no-cache-<span class="built_in">dir</span> ./</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>按照第一个命令，安装后import apex仍然会报错：<code>AttributeError: module &#39;torch.distributed&#39; has no attribute &#39;_all_gather_base&#39;</code>，这是因为torch版本低，但是torch&#x3D;&#x3D;1.7.1是实验要求不可更改，根据github apex<code>issue 1532</code>，要去找branch里的老版本apex –&gt; <code>apex-22.04-dev</code></p>
+</li>
+<li><p>再安装apex，又比较奇怪，这个版本的apex不支持<code>--config-settings</code>，但使用<code>--global-option</code>对应的命令是可以安装完整版的(cuda+cpp+python)，也不会报错<code>packaging module not found</code></p>
 <blockquote>
-<p>Layer l - regular partition                                   Layer l+1 - shifted partition</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147457.png" alt="image-20230814092813118"></p>
-<p>shifted window <em>Pros</em>   克服了窗口间缺乏connections的弱点</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147458.png" alt="image-20230814093001309"></p>
-<p>无计算技巧时的shifted window计算量：</p>
-<p>以Figure 2为例：regular计算量是2×2的窗口数。而shifted如果不用cyclic技巧，就需要加Pad，将所有窗口都变为4×4Patch的窗口大小，再计算，所以计算量就是3×3的窗口数，计算量×2.25</p>
-<p><code>Cyclic shift computation skill</code>: 只用4 windows的计算量，得到9 windows的self-attention结果</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147459.png" alt="image-20230814094808828"></p>
-<p>这样的话计算量还是2×2的窗口数，而且加入了窗口间的connection</p>
-<p><code>masked MSA</code>: 先明确<code>window-based self-attention</code>机制是窗口内部j计算attention，按照<code>shifted window partition</code>的分割方法，例：A模块即使被<code>cyclic shift</code>到图像的下方，也只能和A的转置进行计算attention，不然如果A是天空，灰色部分是地面，shift后A矩阵和灰色部分的矩阵的点乘得到的结果是不合理的，故计算的时候需要<code>mask</code>，负责遮住A与非A部分的矩阵点乘结果。这也符合我们对<code>computation skill</code>的理解，加入了<code>cyclic shift</code>的<code>SW-MSA</code>与<code>有pad的W-MSA</code>计算的attention结果相同</p>
-<p><code>reverse cyclic shift</code>: 将A,B,C复位</p>
+<p>packaging module not found这个报错在<code>issue 1679</code>中讨论到了，并有<code>pull request 1680</code>，解决方案是在<code>pyproject.toml</code>中修改：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953130.png" alt="image-20230820091717667"></p>
+<p>以我之前安装的步骤，这样修改完，再安装apex，会报<code>torch not found</code>，我没有详细论证，但推测和torch 1.7.1有关，这也是接下来要说的</p>
 </blockquote>
 </li>
-<li><p>Relative position bias</p>
-<ol>
-<li><p>修改后的Attention(Q,K,V)</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147460.png" alt="image-20230816110225146"></p>
-<blockquote>
-<p>B是[M^2^, M^2^]大小的矩阵</p>
-</blockquote>
+<li><p>安装仍然有一个报错，就是关于torch的，因为<code>torch.version.cuda</code>的版本(10.2)和真正使用的cuda版本(11.0)不同，所以需要安装对应cuda版本的torch，我的方法是去<a target="_blank" rel="noopener" href="https://download.pytorch.org/whl/torch_stable.html">pytorch官方</a>下载对应的<code>.whl</code>包，并pip安装，之后就可以安装了</p>
 </li>
-<li><p>给一个Window的不同位置的patch加一个位置编码（<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/507105020">reference blog</a>）</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147461.png" alt="image-20230816110001915"></p>
+<li><p>接下来就是比较常规的内容：</p>
+<ol>
+<li>将<code>beit/semantic_segmentation/mmcv_custom</code>添加到环境变量，或者直接复制到对应虚拟环境的<code>site_packages</code>文件夹下，这是因为mmcv_custom调用apex，实现了<code>[&#39;IterBasedRunnerAmp&#39;,&#39;LayerDecayOptimizerConstructor&#39;, &#39;SETR_Resize&#39;, &#39;DistOptimizerHook&#39;, &#39;train_segmentor&#39;]</code>这些训练用的组件</li>
+<li>还有就是将<code>mmseg/core/evaluation/metrics.py</code>中的<code>np.float</code>改为<code>float</code>，因为不再支持<code>np.float</code></li>
+</ol>
+</li>
+<li><p>目前仍待解决的问题：</p>
+<ol>
+<li><p>直接运行报错<code>Invoked &#39;with amp.scale_loss&#39;, but internal Amp state has not been initialized</code>，根据apex官方给出的文档，，apex只需要三行代码就可以优雅地调用Amp</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953131.png" alt="image-20230820093253041"></p>
+<p>我们在<code>mmcv_custom/tran_api.py</code>找到了初始化的实现：这里有一个疑惑，为什么<code>cfg.optimizer_config.get(&quot;use_fp16&quot;, False)</code>下还要初始化Amp为混合精度(根据官方文档，<code>opt_level=&quot;O1&quot;</code>即为混合精度，而正因为<code>use_fp16==True</code>，才成为混合精度(乘法用<code>fp16</code>，加法用<code>fp32</code>，混合精度的好处是<strong>可使显存，训练时间大幅减少，但不明显损害训练精度</strong>)，这一点目前没搞懂。</p>
+<p>并且，从现有的10000 iterations看，训练过程中震荡很明显，速度很慢(160k iters训练预计使用4 days)，batch size也只能开到4(<code>32G显存 单卡</code>)，并不像真正使用了Amp加速训练，这也引出了第二个问题</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># use apex fp16 optimizer</span></span><br><span class="line"><span class="keyword">if</span> cfg.optimizer_config.get(<span class="string">&quot;type&quot;</span>, <span class="literal">None</span>) <span class="keyword">and</span> cfg.optimizer_config[<span class="string">&quot;type&quot;</span>] == <span class="string">&quot;DistOptimizerHook&quot;</span>:</span><br><span class="line">    <span class="keyword">if</span> cfg.optimizer_config.get(<span class="string">&quot;use_fp16&quot;</span>, <span class="literal">False</span>):</span><br><span class="line">        model, optimizer = apex.amp.initialize(</span><br><span class="line">            model.cuda(), optimizer, opt_level=<span class="string">&quot;O1&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> model.modules():</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">hasattr</span>(m, <span class="string">&quot;fp16_enabled&quot;</span>):</span><br><span class="line">                m.fp16_enabled = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>本实验<strong>是否</strong>真的能通过单GPU训练达到<strong>复现</strong>，因为apex工具包的内容全部关于分布式训练，而<strong>分布式训练核心在于将不同计算核心开不同的进程，增大并行量</strong>，单GPU使用分布式训练（目前我实验使用的方法，因为我感觉代码，尤其是mmcv_custom不容易与分布式训练脱钩）。使用<code>ps aux</code>命令查看进程信息：(<code>北京时间8/20 9:50</code>)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953132.png" alt="image-20230820094805062"><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953133.png" alt="image-20230820094732140"></p>
 <blockquote>
-<p>拉成1维合并后 + M-1 -&gt; 索引非负</p>
-<p>行标×(2M-1) 可以区分开关于主对角线对称的位置，并且对结果加和，区间为[0,8]，这个结果可以作为<code>relative_position_bias_table</code>的索引</p>
-<p>table怎么计算：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">relative_position_bias_table = nn.Parameter(torch.zeros((<span class="number">2</span> * window_size[<span class="number">0</span>] - <span class="number">1</span>) * (<span class="number">2</span> * window_size[<span class="number">1</span>] - <span class="number">1</span>)))</span><br><span class="line">trunc_normal_(relative_position_bias_table, std=<span class="number">.02</span>) <span class="comment"># 正态分布应该是为了控制相对位置编码在(-1, 1)之间，位置编码的原则可以看我Attention is all you need的论文笔记</span></span><br></pre></td></tr></table></figure>
-
+<p>可以看出与多进程相关的任务很多，但真正在服务于训练的只有<code>PID 32444</code>的进程，所以分布式训练可能很难真正起作用，因为计算核心只有一个包括即使修复了第一个问题，可以使用混合精度，是否会真正性能提升也是未知数</p>
 </blockquote>
 </li>
 </ol>
@@ -351,7 +317,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://example.com/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" title="Swin-Transformer-V1论文笔记">http://example.com/2023/08/16/Swin-Transformer-V1论文笔记/</a>
+    <a href="http://example.com/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" title="跑通beit v1的语义分割任务">http://example.com/2023/08/20/跑通beit v1的语义分割任务/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -363,6 +329,8 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/transformer/" rel="tag"># transformer</a>
+              <a href="/tags/configure-environment/" rel="tag"># configure environment</a>
+              <a href="/tags/coding/" rel="tag"># coding</a>
           </div>
 
         
@@ -371,13 +339,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2023/08/15/%E8%B7%91%E9%80%9ASwin-Transformer-V2%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" rel="prev" title="跑通Swin-Transformer-V2语义分割任务">
-      <i class="fa fa-chevron-left"></i> 跑通Swin-Transformer-V2语义分割任务
+    <a href="/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" rel="prev" title="Swin-Transformer-V2论文笔记">
+      <i class="fa fa-chevron-left"></i> Swin-Transformer-V2论文笔记
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" rel="next" title="Swin-Transformer-V2论文笔记">
-      Swin-Transformer-V2论文笔记 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
