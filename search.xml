@@ -501,6 +501,23 @@
         <category>deep learning</category>
       </categories>
       <tags>
+        <tag>transformer</tag>
+        <tag>semantic segmentation</tag>
+        <tag>configure environment</tag>
+        <tag>coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>跑通Swin-Transformer-V2语义分割任务</title>
+    <url>/2023/08/15/%E8%B7%91%E9%80%9ASwin-Transformer-V2%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/</url>
+    <content><![CDATA[<p><a href="https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation"><strong>github仓库地址</strong></a></p>
+<p><a href="https://lyhkk12138.cn/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">Swin-Transformer-V1博文地址</a></p>
+]]></content>
+      <categories>
+        <category>deep learning</category>
+      </categories>
+      <tags>
+        <tag>transformer</tag>
         <tag>semantic segmentation</tag>
         <tag>configure environment</tag>
         <tag>coding</tag>
@@ -564,21 +581,6 @@
       </categories>
       <tags>
         <tag>transformer</tag>
-        <tag>configure environment</tag>
-        <tag>coding</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>跑通Swin-Transformer-V2语义分割任务</title>
-    <url>/2023/08/15/%E8%B7%91%E9%80%9ASwin-Transformer-V2%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/</url>
-    <content><![CDATA[<p><a href="https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation"><strong>github仓库地址</strong></a></p>
-<p><a href="">Swin-Transformer-V1博文地址</a></p>
-<p><img src="C:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20230815183609946.png" alt="image-20230815183609946"></p>
-]]></content>
-      <categories>
-        <category>deep learning</category>
-      </categories>
-      <tags>
         <tag>semantic segmentation</tag>
         <tag>configure environment</tag>
         <tag>coding</tag>
