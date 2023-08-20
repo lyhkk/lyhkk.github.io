@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953132.png">
 <meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953133.png">
 <meta property="article:published_time" content="2023-08-19T19:54:35.000Z">
-<meta property="article:modified_time" content="2023-08-20T01:57:42.127Z">
+<meta property="article:modified_time" content="2023-08-20T09:35:10.537Z">
 <meta property="article:author" content="lyhkk">
 <meta property="article:tag" content="transformer">
 <meta property="article:tag" content="semantic segmentation">
@@ -223,7 +223,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2023-08-20 03:54:35 / 修改时间：09:57:42" itemprop="dateCreated datePublished" datetime="2023-08-20T03:54:35+08:00">2023-08-20</time>
+              <time title="创建时间：2023-08-20 03:54:35 / 修改时间：17:35:10" itemprop="dateCreated datePublished" datetime="2023-08-20T03:54:35+08:00">2023-08-20</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -286,7 +286,9 @@
 <li>还有就是将<code>mmseg/core/evaluation/metrics.py</code>中的<code>np.float</code>改为<code>float</code>，因为不再支持<code>np.float</code></li>
 </ol>
 </li>
-<li><p>目前仍待解决的问题：</p>
+<li><p>参数：batch size(samples_per_gpu) &#x3D; 4，workers &#x3D; 8，占用显存达到98%</p>
+</li>
+<li><p>目前仍待解决的问题：(北京时间 8&#x2F;20 9:50 更新)</p>
 <ol>
 <li><p>直接运行报错<code>Invoked &#39;with amp.scale_loss&#39;, but internal Amp state has not been initialized</code>，根据apex官方给出的文档，，apex只需要三行代码就可以优雅地调用Amp</p>
 <p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953131.png" alt="image-20230820093253041"></p>
@@ -294,13 +296,42 @@
 <p>并且，从现有的10000 iterations看，训练过程中震荡很明显，速度很慢(160k iters训练预计使用4 days)，batch size也只能开到4(<code>32G显存 单卡</code>)，并不像真正使用了Amp加速训练，这也引出了第二个问题</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># use apex fp16 optimizer</span></span><br><span class="line"><span class="keyword">if</span> cfg.optimizer_config.get(<span class="string">&quot;type&quot;</span>, <span class="literal">None</span>) <span class="keyword">and</span> cfg.optimizer_config[<span class="string">&quot;type&quot;</span>] == <span class="string">&quot;DistOptimizerHook&quot;</span>:</span><br><span class="line">    <span class="keyword">if</span> cfg.optimizer_config.get(<span class="string">&quot;use_fp16&quot;</span>, <span class="literal">False</span>):</span><br><span class="line">        model, optimizer = apex.amp.initialize(</span><br><span class="line">            model.cuda(), optimizer, opt_level=<span class="string">&quot;O1&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> model.modules():</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">hasattr</span>(m, <span class="string">&quot;fp16_enabled&quot;</span>):</span><br><span class="line">                m.fp16_enabled = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
 </li>
-<li><p>本实验<strong>是否</strong>真的能通过单GPU训练达到<strong>复现</strong>，因为apex工具包的内容全部关于分布式训练，而<strong>分布式训练核心在于将不同计算核心开不同的进程，增大并行量</strong>，单GPU使用分布式训练（目前我实验使用的方法，因为我感觉代码，尤其是mmcv_custom不容易与分布式训练脱钩）。使用<code>ps aux</code>命令查看进程信息：(<code>北京时间8/20 9:50</code>)</p>
+<li><p>本实验<strong>是否</strong>真的能通过单GPU训练达到<strong>复现</strong>，因为apex工具包的内容全部关于分布式训练，而<strong>分布式训练核心在于将不同计算核心开不同的进程，增大并行量</strong>，单GPU使用分布式训练（目前我实验使用的方法，因为我感觉代码，尤其是mmcv_custom不容易与分布式训练脱钩）。使用<code>ps aux</code>命令查看进程信息：</p>
 <p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953132.png" alt="image-20230820094805062"><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953133.png" alt="image-20230820094732140"></p>
 <blockquote>
 <p>可以看出与多进程相关的任务很多，但真正在服务于训练的只有<code>PID 32444</code>的进程，所以分布式训练可能很难真正起作用，因为计算核心只有一个包括即使修复了第一个问题，可以使用混合精度，是否会真正性能提升也是未知数</p>
 </blockquote>
 </li>
 </ol>
+</li>
+<li><p>解决未使用fp16的问题：(8&#x2F;20 14:28更新)</p>
+<ol>
+<li><p>之前运行<code>dist_train.sh</code>脚本，总提示</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RuntimeError: Invoked <span class="string">&#x27;with amp.scale_loss&#x27;</span>, but internal Amp state has not been initialized.  model, optimizer = amp.initialize(model, optimizer, opt_level=...) must be called before with `amp.scale_loss`.</span><br></pre></td></tr></table></figure>
+
+<p>这个报错表示：model和optimizer这两个internal Amp state初始化必须在<code>with amp.scale_loss</code>之前。而<code>with amp.scale_loss</code>的调用在site-packages文件夹下<code>mmseg/apis/train.py</code>的<code>train_segmentor</code>类中。故我们一定要修改它，mmcv_custom(<strong>mmcv_custom提供了一系列在本次实验中适用的api</strong>)中，我们找到了适合的train_segmentor类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">1. 将`optimizer = build_optimizer(model, cfg.optimizer)`放在`if distributed:`之前</span></span><br><span class="line"><span class="string">2. 将初始化Amp state写在optimizer创建和`if distributed:`之间</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="comment"># use apex fp16 optimizer</span></span><br><span class="line"><span class="keyword">if</span> cfg.optimizer_config.get(<span class="string">&quot;type&quot;</span>, <span class="literal">None</span>) <span class="keyword">and</span> cfg.optimizer_config[<span class="string">&quot;type&quot;</span>] == <span class="string">&quot;DistOptimizerHook&quot;</span>:</span><br><span class="line">   <span class="keyword">if</span> cfg.optimizer_config.get(<span class="string">&quot;use_fp16&quot;</span>, <span class="literal">False</span>): <span class="comment"># False没懂</span></span><br><span class="line">       model, optimizer = apex.amp.initialize(</span><br><span class="line">           model.cuda(), optimizer, opt_level=<span class="string">&quot;O1&quot;</span>)</span><br><span class="line">       <span class="keyword">for</span> m <span class="keyword">in</span> model.modules():</span><br><span class="line">           <span class="keyword">if</span> <span class="built_in">hasattr</span>(m, <span class="string">&quot;fp16_enabled&quot;</span>):</span><br><span class="line">               m.fp16_enabled = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+<p>在<code>mmseg/apis/train.py</code>中，我写成了：(因为只要分布式训练，我就用amp)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">optimizer = build_optimizer(model, cfg.optimizer)</span><br><span class="line"><span class="comment"># put model on gpus</span></span><br><span class="line"><span class="keyword">if</span> distributed:</span><br><span class="line">    find_unused_parameters = cfg.get(<span class="string">&#x27;find_unused_parameters&#x27;</span>, <span class="literal">False</span>)</span><br><span class="line">    <span class="comment"># Sets the `find_unused_parameters` parameter in</span></span><br><span class="line">    <span class="comment"># torch.nn.parallel.DistributedDataParallel</span></span><br><span class="line">    model, optimizer = apex.amp.initialize(model.cuda(), optimizer, opt_level=<span class="string">&quot;O1&quot;</span>)</span><br><span class="line">    model = MMDistributedDataParallel(</span><br><span class="line">        model.cuda(),</span><br><span class="line">        device_ids=[torch.cuda.current_device()],</span><br><span class="line">        broadcast_buffers=<span class="literal">False</span>,</span><br><span class="line">        find_unused_parameters=find_unused_parameters)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>结果：训练时间缩短为一半，但部分loss出现梯度溢出的情况，且显存消耗依然很大，仍有很多需改进的部分</p>
+<p>推测是</p>
+<ol>
+<li><code>mask_fill</code>使用-1e9 mask的问题</li>
+<li>softmax的溢出</li>
+<li>sum函数的溢出</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+</li>
+<li><p>解决无法validation的问题：</p>
+<p><code>IterBasedRunnerAmp</code>是现用的runner，按照mmcv_custom的写法，它将被注册到mmcv的<code>registry</code>类当中，但在mmseg的<code>apis/train.py</code>的第110行左右，内容是<code>eval_cfg[&#39;by_epoch&#39;] = cfg.runner[&#39;type&#39;] != &#39;IterBasedRunner&#39;</code>，在这里，<code>IterBaseRunnerAmp</code>并不会被识别为<code>IterBasedRunner</code>，尽管实际上它是。所以，这里我直接改成了<code>eval_cfg[&#39;by_epoch&#39;] = False</code></p>
+<blockquote>
+<p>validation之后显存不足 -&gt; <strong>new issue</strong> -&gt; 目前先把validation去掉，打算先花2天跑完 Training</p>
+</blockquote>
 </li>
 </ol>
 
