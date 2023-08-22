@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953133.png">
 <meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308221614170.png">
 <meta property="article:published_time" content="2023-08-19T19:54:35.000Z">
-<meta property="article:modified_time" content="2023-08-22T08:35:25.149Z">
+<meta property="article:modified_time" content="2023-08-22T08:39:16.747Z">
 <meta property="article:author" content="lyhkk">
 <meta property="article:tag" content="transformer">
 <meta property="article:tag" content="semantic segmentation">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-22 16:35:25" itemprop="dateModified" datetime="2023-08-22T16:35:25+08:00">2023-08-22</time>
+                <time title="修改时间：2023-08-22 16:39:16" itemprop="dateModified" datetime="2023-08-22T16:39:16+08:00">2023-08-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -339,7 +339,7 @@
 <li><p>解决无法validation的问题：</p>
 <p><code>IterBasedRunnerAmp</code>是现用的runner，按照mmcv_custom的写法，它将被注册到mmcv的<code>registry</code>类当中，但在mmseg的<code>apis/train.py</code>的第110行左右，内容是<code>eval_cfg[&#39;by_epoch&#39;] = cfg.runner[&#39;type&#39;] != &#39;IterBasedRunner&#39;</code>，在这里，<code>IterBaseRunnerAmp</code>并不会被识别为<code>IterBasedRunner</code>，尽管实际上它是。所以，这里我直接改成了<code>eval_cfg[&#39;by_epoch&#39;] = False</code></p>
 <blockquote>
-<p>validation之后显存不足 -&gt; <strong>new issue</strong> -&gt; 目前先把validation去掉，打算先花2天跑完 Training</p>
+<p>validation之后显存不足 -&gt; <strong>new issue</strong> -&gt; 目前先把validation设为<code>160000iterations</code>做一次，打算先花2天跑完 Training，只看最后的validation结果</p>
 </blockquote>
 </li>
 </ol>
