@@ -22,7 +22,7 @@
 
   <meta name="description" content="使用Github上Microsoft的unilm仓库，跑通BEiT V1的语义分割任务，笔记重点在于配置环境不断找到解决方案的思路。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="跑通beit v1的语义分割任务">
+<meta property="og:title" content="跑通Beit V1的语义分割任务">
 <meta property="og:url" content="http://example.com/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/index.html">
 <meta property="og:site_name" content="Code×Life">
 <meta property="og:description" content="使用Github上Microsoft的unilm仓库，跑通BEiT V1的语义分割任务，笔记重点在于配置环境不断找到解决方案的思路。">
@@ -35,12 +35,12 @@
 <meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953133.png">
 <meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308221614170.png">
 <meta property="article:published_time" content="2023-08-19T19:54:35.000Z">
-<meta property="article:modified_time" content="2023-08-22T08:39:16.747Z">
+<meta property="article:modified_time" content="2023-08-29T02:29:06.443Z">
 <meta property="article:author" content="lyhkk">
-<meta property="article:tag" content="transformer">
-<meta property="article:tag" content="semantic segmentation">
-<meta property="article:tag" content="configure environment">
-<meta property="article:tag" content="coding">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="Semantic Segmentation">
+<meta property="article:tag" content="Configure Environment">
+<meta property="article:tag" content="Coding">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953127.png">
 
@@ -57,7 +57,7 @@
   };
 </script>
 
-  <title>跑通beit v1的语义分割任务 | Code×Life</title>
+  <title>跑通Beit V1的语义分割任务 | Code×Life</title>
   
 
 
@@ -213,7 +213,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          跑通beit v1的语义分割任务
+          跑通Beit V1的语义分割任务
         </h1>
 
         <div class="post-meta">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-22 16:39:16" itemprop="dateModified" datetime="2023-08-22T16:39:16+08:00">2023-08-22</time>
+                <time title="修改时间：2023-08-29 10:29:06" itemprop="dateModified" datetime="2023-08-29T10:29:06+08:00">2023-08-29</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -238,7 +238,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/deep-learning/" itemprop="url" rel="index"><span itemprop="name">deep learning</span></a>
+                  <a href="/categories/Deep-Learning/" itemprop="url" rel="index"><span itemprop="name">Deep Learning</span></a>
                 </span>
             </span>
 
@@ -262,8 +262,7 @@
 
       
         <p><a target="_blank" rel="noopener" href="https://github.com/microsoft/unilm/tree/master">Github仓库地址</a></p>
-<p><strong>Configure the virtual environment</strong></p>
-<ol>
+<h3 id="Configure-the-virtual-environment"><a href="#Configure-the-virtual-environment" class="headerlink" title="Configure the virtual environment"></a><strong>Configure the virtual environment</strong></h3><ol>
 <li><p>首先，要确保环境为<strong>cuda 11.0</strong>，cuda版本是为之后<code>mmcv-full 1.3.0</code>(包含所有的特性以及丰富的开箱即用的CPU 和<strong>CUDA 算子</strong>)安装做准备。<strong>显卡驱动版本</strong>要支持这个cuda版本（笔者使用腾讯云  V100 GPU云服务器，下图是GPU驱动和cuda版本）<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200953127.png" alt="image-20230820040252534"></p>
 </li>
 <li><p><code>conda create</code>创建一个<code>Python 3.8</code>的虚拟环境，也是为<code>mmcv-full</code>安装做准备</p>
@@ -343,8 +342,7 @@
 </blockquote>
 </li>
 </ol>
-<p><strong>Results</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308221614170.png" alt="image-20230822161403800"></p>
+<h3 id="Results"><a href="#Results" class="headerlink" title="Results"></a><strong>Results</strong></h3><p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308221614170.png" alt="image-20230822161403800"></p>
 <blockquote>
 <p>差距主要由于batch size(我是4 batchs&#x2F;GPU * 1 GPU，github是2 batchs&#x2F;GPU * 8 GPUs)</p>
 </blockquote>
@@ -364,7 +362,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://example.com/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" title="跑通beit v1的语义分割任务">http://example.com/2023/08/20/跑通beit v1的语义分割任务/</a>
+    <a href="http://example.com/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" title="跑通Beit V1的语义分割任务">http://example.com/2023/08/20/跑通beit v1的语义分割任务/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -375,10 +373,10 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/transformer/" rel="tag"># transformer</a>
-              <a href="/tags/semantic-segmentation/" rel="tag"># semantic segmentation</a>
-              <a href="/tags/configure-environment/" rel="tag"># configure environment</a>
-              <a href="/tags/coding/" rel="tag"># coding</a>
+              <a href="/tags/Transformer/" rel="tag"># Transformer</a>
+              <a href="/tags/Semantic-Segmentation/" rel="tag"># Semantic Segmentation</a>
+              <a href="/tags/Configure-Environment/" rel="tag"># Configure Environment</a>
+              <a href="/tags/Coding/" rel="tag"># Coding</a>
           </div>
 
         
@@ -387,10 +385,13 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" rel="prev" title="Swin-Transformer-V2论文笔记">
-      <i class="fa fa-chevron-left"></i> Swin-Transformer-V2论文笔记
+    <a href="/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" rel="prev" title="Swin Transformer V2论文笔记">
+      <i class="fa fa-chevron-left"></i> Swin Transformer V2论文笔记
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2023/08/29/MetaRL/" rel="next" title="MetaRL">
+      MetaRL <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -449,6 +450,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Configure-the-virtual-environment"><span class="nav-number">1.</span> <span class="nav-text">Configure the virtual environment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Results"><span class="nav-number">2.</span> <span class="nav-text">Results</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -464,20 +466,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
