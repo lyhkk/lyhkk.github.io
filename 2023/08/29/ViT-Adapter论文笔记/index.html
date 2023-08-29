@@ -20,17 +20,27 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Time flies, but I am the pilot!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Code×Life">
-<meta property="og:url" content="http://example.com/archives/2023/08/index.html">
+  <meta name="description" content="解读ViT Adapter的网络结构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ViT Adapter论文笔记">
+<meta property="og:url" content="http://example.com/2023/08/29/ViT-Adapter%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="Code×Life">
-<meta property="og:description" content="Time flies, but I am the pilot!">
+<meta property="og:description" content="解读ViT Adapter的网络结构">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726288.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726290.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726291.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726292.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726293.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726294.png">
+<meta property="article:published_time" content="2023-08-29T09:23:55.000Z">
+<meta property="article:modified_time" content="2023-08-29T09:37:57.463Z">
 <meta property="article:author" content="lyhkk">
+<meta property="article:tag" content="Transformer">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726288.png">
 
-<link rel="canonical" href="http://example.com/archives/2023/08/">
+<link rel="canonical" href="http://example.com/2023/08/29/ViT-Adapter%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">
 
 
 <script id="page-configurations">
@@ -38,12 +48,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Code×Life</title>
+  <title>ViT Adapter论文笔记 | Code×Life</title>
   
 
 
@@ -179,190 +189,162 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 9 篇日志。 继续努力。</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/29/ViT-Adapter%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="lyhkk">
+      <meta itemprop="description" content="Time flies, but I am the pilot!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Code×Life">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ViT Adapter论文笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-29 17:23:55 / 修改时间：17:37:57" itemprop="dateCreated datePublished" datetime="2023-08-29T17:23:55+08:00">2023-08-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Deep-Learning/" itemprop="url" rel="index"><span itemprop="name">Deep Learning</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">解读ViT Adapter的网络结构</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2023</span>
-    </div>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-29T17:23:55+08:00"
-              content="2023-08-29">
-          08-29
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/29/ViT-Adapter%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" itemprop="url">
-            <span itemprop="name">ViT Adapter论文笔记</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-29T10:25:53+08:00"
-              content="2023-08-29">
-          08-29
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/29/MetaRL/" itemprop="url">
-            <span itemprop="name">MetaRL</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-20T03:54:35+08:00"
-              content="2023-08-20">
-          08-20
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" itemprop="url">
-            <span itemprop="name">跑通Beit V1的语义分割任务</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-20T03:44:01+08:00"
-              content="2023-08-20">
-          08-20
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" itemprop="url">
-            <span itemprop="name">Swin Transformer V2论文笔记</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-16T11:49:05+08:00"
-              content="2023-08-16">
-          08-16
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" itemprop="url">
-            <span itemprop="name">Swin Transformer V1论文笔记</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-15T18:19:20+08:00"
-              content="2023-08-15">
-          08-15
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/15/%E8%B7%91%E9%80%9ASwin-Transformer-V2%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" itemprop="url">
-            <span itemprop="name">跑通Swin Transformer V2语义分割任务</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-14T10:49:09+08:00"
-              content="2023-08-14">
-          08-14
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/14/Attention%20Is%20All%20You%20Need%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" itemprop="url">
-            <span itemprop="name">Attention Is All You Need论文笔记</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-10T23:10:55+08:00"
-              content="2023-08-10">
-          08-10
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/10/%E8%B7%91%E9%80%9ASwin-Transformer-V1%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" itemprop="url">
-            <span itemprop="name">跑通Swin Transformer V1语义分割任务</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+        <h2 id="ViT-Adapter网络结构学习"><a href="#ViT-Adapter网络结构学习" class="headerlink" title="ViT Adapter网络结构学习"></a>ViT Adapter网络结构学习</h2><p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2205.08534">Paper reference</a></p>
+<h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><ol>
+<li><p>本论文提出的ViT Adapter是用在<code>Dense prediction task</code>上的，包括语义分割、实例分割等像素级预测的任务</p>
+</li>
+<li><p>与Plain ViT的对比：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726288.png" alt="image-20230829152421183"></p>
+<blockquote>
+<p>对比plain ViT，使用多模态的数据集预训练backbone，应用到下游任务时，选用合适的Adapter去微调</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="Architecture"><a href="#Architecture" class="headerlink" title="Architecture"></a>Architecture</h3><p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726290.png" alt="image-20230829161300843"></p>
+<blockquote>
+<p>(a) ViT: 相当于没有MLP Head的Plain ViT</p>
+<p>(b) ViT-Adapter: 包括(c) (d) (e)三个部分，主要职责是产生多尺度的特征表示，解决了Plain ViT产生单尺度、低分辨率特征图的问题，更适合Dense prediction task</p>
+<p>(c) Spatial Prior Module:</p>
+<ol>
+<li><p>model local spatial contexts from the input image(对原始输入图像的空间上下文信息建模)</p>
+</li>
+<li><p>这个module和ViT的<code>Patch Embedding</code>是平行的，先通过<code>stem</code>(3个卷积层和一个最大池化层组成，其中，第一个卷积层使得图像分辨率&#x2F;2, 通道数由3变为inplane；最大池化层让分辨率&#x2F;2)，再通过3个卷积层(每个都是分辨率&#x2F;2，通道数×2) -&gt; 产生了1&#x2F;8, 1&#x2F;16, 1&#x2F;32三个分辨率的特征图，再将3个尺度<code>1/8, 1/16, 1/32</code>的特征图映射到D-dimension，flatten(特征图-&gt;向量) &amp; concat -&gt; <code>D-dimensional spatial feature token</code>(如下图F<sub>sp</sub>^1^)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726291.png" alt="image-20230829163954662"></p>
+</li>
+<li><p>输出：具有多尺度的空间特征</p>
+</li>
+</ol>
+<p>(d) Spatial Feature Injector: (F<sub>vit</sub><sup>i</sup>代表即将输入到ViT的Block i的特征)</p>
+<ol>
+<li><p>顾名思义，将先验的空间特征”注射”给ViT的第i个block的输入，通过<code>Cross-Attention</code>机制交互-&gt;获得多尺度空间信息</p>
+</li>
+<li><p>数学表示：<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726292.png" alt="image-20230829164218239"></p>
+<p>假设输入分patch时分为16×16个patch</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726293.png" alt="image-20230829164253193"></p>
+<p>γ是可学习向量∈R<sup>D</sup>，用来平衡ViT第 i block的输入和<code>Cross-Attention</code>之后的输出</p>
+</li>
+</ol>
+<p>(e) Multi-Scale Feature Extractor:</p>
+<ol>
+<li><p>基于ViT第i个Blcok输出的单尺度特征(记为F<sub>vit</sub><sup>i+1</sup>)，重组(reorganize)多尺度的空间特征(F<sub>sp</sub><sup>i</sup> -&gt; F<sub>sp</sub><sup>i+1</sup>)</p>
+</li>
+<li><p>数学表示：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308291726294.png" alt="image-20230829170356182"></p>
+<blockquote>
+<p>与Injector不同的是，进入<code>Cross-Attention</code>的query和(key,value)的角色互换了，因为Injector是依据F<sub>sp</sub><sup>i</sup> (作为key和value)产生F<sub>vit</sub><sup>i</sup>(query)，Extractor是依据F<sub>vit</sub><sup>i+1</sup>(key,value)产生F<sub>sp</sub><sup>i+1</sup>(F<sub>sp</sub><sup>i</sup>为query)</p>
+</blockquote>
+</li>
+<li><p>FFN是Feed-Forward Network(前馈神经网络)，实现ViT Adapter多用<code>Conv FFN</code>，增强非线性表达能力(Attention是矩阵乘法，是线性变化)</p>
+</li>
+</ol>
+</blockquote>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>lyhkk
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2023/08/29/ViT-Adapter%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" title="ViT Adapter论文笔记">http://example.com/2023/08/29/ViT-Adapter论文笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Transformer/" rel="tag"># Transformer</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/29/MetaRL/" rel="prev" title="MetaRL">
+      <i class="fa fa-chevron-left"></i> MetaRL
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
@@ -415,6 +397,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ViT-Adapter%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84%E5%AD%A6%E4%B9%A0"><span class="nav-number">1.</span> <span class="nav-text">ViT Adapter网络结构学习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Overview"><span class="nav-number">1.1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Architecture"><span class="nav-number">1.2.</span> <span class="nav-text">Architecture</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
