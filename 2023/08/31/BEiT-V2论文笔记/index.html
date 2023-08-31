@@ -20,17 +20,26 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Time flies, but I am the pilot!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Code×Life">
-<meta property="og:url" content="http://example.com/archives/2023/index.html">
+  <meta name="description" content="BEiT V2网络结构解读">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BEiT V2论文笔记">
+<meta property="og:url" content="http://example.com/2023/08/31/BEiT-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="Code×Life">
-<meta property="og:description" content="Time flies, but I am the pilot!">
+<meta property="og:description" content="BEiT V2网络结构解读">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057051.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057052.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057054.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057055.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057056.png">
+<meta property="article:published_time" content="2023-08-31T02:56:11.000Z">
+<meta property="article:modified_time" content="2023-08-31T02:57:48.217Z">
 <meta property="article:author" content="lyhkk">
+<meta property="article:tag" content="Transformer">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057051.png">
 
-<link rel="canonical" href="http://example.com/archives/2023/">
+<link rel="canonical" href="http://example.com/2023/08/31/BEiT-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">
 
 
 <script id="page-configurations">
@@ -38,12 +47,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>归档 | Code×Life</title>
+  <title>BEiT V2论文笔记 | Code×Life</title>
   
 
 
@@ -179,230 +188,165 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <span class="collection-header">嗯..! 目前共计 10 篇日志。 继续努力。</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/31/BEiT-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="lyhkk">
+      <meta itemprop="description" content="Time flies, but I am the pilot!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Code×Life">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          BEiT V2论文笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-08-31 10:56:11 / 修改时间：10:57:48" itemprop="dateCreated datePublished" datetime="2023-08-31T10:56:11+08:00">2023-08-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Deep-Learning/" itemprop="url" rel="index"><span itemprop="name">Deep Learning</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">BEiT V2网络结构解读</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2023</span>
-    </div>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-31T10:56:11+08:00"
-              content="2023-08-31">
-          08-31
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/31/BEiT-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" itemprop="url">
-            <span itemprop="name">BEiT V2论文笔记</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-29T17:23:55+08:00"
-              content="2023-08-29">
-          08-29
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/29/ViT-Adapter%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" itemprop="url">
-            <span itemprop="name">ViT Adapter论文笔记</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-29T10:25:53+08:00"
-              content="2023-08-29">
-          08-29
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/29/MetaRL/" itemprop="url">
-            <span itemprop="name">MetaRL</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-20T03:54:35+08:00"
-              content="2023-08-20">
-          08-20
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" itemprop="url">
-            <span itemprop="name">跑通Beit V1的语义分割任务</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-20T03:44:01+08:00"
-              content="2023-08-20">
-          08-20
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" itemprop="url">
-            <span itemprop="name">Swin Transformer V2论文笔记</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-16T11:49:05+08:00"
-              content="2023-08-16">
-          08-16
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" itemprop="url">
-            <span itemprop="name">Swin Transformer V1论文笔记</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-15T18:19:20+08:00"
-              content="2023-08-15">
-          08-15
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/15/%E8%B7%91%E9%80%9ASwin-Transformer-V2%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" itemprop="url">
-            <span itemprop="name">跑通Swin Transformer V2语义分割任务</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-14T10:49:09+08:00"
-              content="2023-08-14">
-          08-14
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/14/Attention%20Is%20All%20You%20Need%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" itemprop="url">
-            <span itemprop="name">Attention Is All You Need论文笔记</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-08-10T23:10:55+08:00"
-              content="2023-08-10">
-          08-10
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/08/10/%E8%B7%91%E9%80%9ASwin-Transformer-V1%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" itemprop="url">
-            <span itemprop="name">跑通Swin Transformer V1语义分割任务</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-07-05T23:55:57+08:00"
-              content="2023-07-05">
-          07-05
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/2023/07/05/C-STL/" itemprop="url">
-            <span itemprop="name">C++ STL</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+        <p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2208.06366">BEiT V2 paper</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/566511151">paper note reference</a></p>
+<h2 id="BEiT-V2-architecture"><a href="#BEiT-V2-architecture" class="headerlink" title="BEiT V2 architecture"></a>BEiT V2 architecture</h2><ol>
+<li><p><strong>Overall impression</strong>: two-stage training </p>
+<ol>
+<li>input image -&gt; visual tokens -&gt; visual presentation (approach: <strong>VQ-KD</strong>)</li>
+<li>masked image -&gt;  visual presentation from stage 1 (approach: <strong>MIM</strong>)</li>
+</ol>
+</li>
+<li><p><strong>VQ-KD process</strong>（Vector-quantized Knowledge Distillation）</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057051.png" alt="image-20230825105555838"></p>
+<ol>
+<li><p><strong>Visual</strong> <strong>codebook</strong>: For a given dataset of visual features extracted from images, we can employ the <strong>K-means algorithm</strong> to <strong>cluster</strong> them into <strong>several prominent categories</strong>. The number of these categories determines the size of the visual codebook, where <strong>each category’s centroid</strong> represents <strong>the specific content of a visual word in the dictionary.</strong></p>
+</li>
+<li><p><strong>Tokenizer encoder</strong></p>
+<ol>
+<li><p><strong>ViT</strong>: encode the image patches and generate <strong>eigen vector representations</strong>(From the above figure, N for patch number, D for the dimension of vector)</p>
+</li>
+<li><p><strong>Nearest Neighbor Lookup</strong>: employ the <strong>L2-norm</strong> to regularize encoder output {h<del>i</del>^p^}<del>i&#x3D;1</del>^N^ and codebook embeddings {e<del>i</del>^p^}<del>i&#x3D;1</del>^K^ , then cauculate the <strong>minimum cosine distance</strong> between them.</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057052.png" alt="image-20230825112433459"></p>
+</li>
+</ol>
+</li>
+<li><p><strong>Decoder</strong></p>
+<p>Using the nearest neighbor of each image patch as the input of <em>Decoder</em> part. Output is the <strong>semantic reconstruction</strong> of these visual tokens.</p>
+</li>
+<li><p><strong>Optimization target(teacher system)</strong></p>
+<p>The strategy of VQ-KD involves <strong>utilizing the feature learning strategies proposed in model distillation</strong>. VQ-KD employs <em><strong>CLIP</strong></em>  or <em><strong>DINO</strong></em>  as the <strong>teacher</strong> systems, and utilizes <strong>the features generated by the teacher systems</strong> as the <strong>optimization objective</strong> for training the model.</p>
+</li>
+<li><p><strong>Gradient backpropagation</strong></p>
+<p>The <em>arg min</em> function is <strong>non-differentiable</strong>. In order to backpropagate gradients to the encoder, VQ-KD adopts the approach proposed in VQ-VAE which <strong>directly copies the gradients from the decoder’s input to the encoder’s output</strong> (indicated by <strong>the red arrow in Figure 1</strong>), as their <strong>optimization directions align</strong>.</p>
+</li>
+</ol>
+</li>
+<li><p><strong>BEiT V2 pretrain(MIM)</strong> -&gt; copy from <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/566511151">blog</a></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057054.png" alt="image-20230825113940448"></p>
+<ol>
+<li><p><strong>MIM</strong></p>
+<ol>
+<li><p><code>[CLS]</code> token is settled to learn global information</p>
+</li>
+<li><p>The left part of <code>Figure 3</code> is MIM pretraining process.</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057055.png" alt="image-20230825114829154"></p>
+</li>
+</ol>
+</li>
+<li><p><code>[CLS]</code> <strong>pretrain</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057056.png" alt="image-20230825121059114"></p>
+</li>
+</ol>
+</li>
+</ol>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>lyhkk
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://example.com/2023/08/31/BEiT-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" title="BEiT V2论文笔记">http://example.com/2023/08/31/BEiT-V2论文笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Transformer/" rel="tag"># Transformer</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/29/ViT-Adapter%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" rel="prev" title="ViT Adapter论文笔记">
+      <i class="fa fa-chevron-left"></i> ViT Adapter论文笔记
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
 
@@ -455,6 +399,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#BEiT-V2-architecture"><span class="nav-number">1.</span> <span class="nav-text">BEiT V2 architecture</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
