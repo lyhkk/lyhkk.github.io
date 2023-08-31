@@ -20,28 +20,17 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="根据paper原文和medium上的讲解，总结Swin Transformer V2的论文笔记">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Swin Transformer V2论文笔记">
-<meta property="og:url" content="http://example.com/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/index.html">
+  <meta name="description" content="Time flies, but I am the pilot!">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Code×Life">
+<meta property="og:url" content="http://example.com/archives/page/2/index.html">
 <meta property="og:site_name" content="Code×Life">
-<meta property="og:description" content="根据paper原文和medium上的讲解，总结Swin Transformer V2的论文笔记">
+<meta property="og:description" content="Time flies, but I am the pilot!">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346006.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346007.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346008.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346009.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346010.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346011.png">
-<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346012.png">
-<meta property="article:published_time" content="2023-08-19T19:44:01.000Z">
-<meta property="article:modified_time" content="2023-08-29T09:24:51.611Z">
 <meta property="article:author" content="lyhkk">
-<meta property="article:tag" content="Transformer">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346006.png">
 
-<link rel="canonical" href="http://example.com/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">
+<link rel="canonical" href="http://example.com/archives/page/2/">
 
 
 <script id="page-configurations">
@@ -49,12 +38,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : true,
+    isPost : false,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>Swin Transformer V2论文笔记 | Code×Life</title>
+  <title>归档 | Code×Life</title>
   
 
 
@@ -190,210 +179,54 @@
         <div class="content-wrap">
           
 
-          <div class="content post posts-expand">
+          <div class="content archive">
             
 
-    
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="lyhkk">
-      <meta itemprop="description" content="Time flies, but I am the pilot!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Code×Life">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Swin Transformer V2论文笔记
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-08-20 03:44:01" itemprop="dateCreated datePublished" datetime="2023-08-20T03:44:01+08:00">2023-08-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-08-29 17:24:51" itemprop="dateModified" datetime="2023-08-29T17:24:51+08:00">2023-08-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Deep-Learning/" itemprop="url" rel="index"><span itemprop="name">Deep Learning</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span>
-            <div class="post-description">根据paper原文和medium上的讲解，总结Swin Transformer V2的论文笔记</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+  
+  <div class="post-block">
+    <div class="posts-collapse">
+      <div class="collection-title">
+        <span class="collection-header">嗯..! 目前共计 11 篇日志。 继续努力。</span>
+      </div>
 
       
-        <p><a target="_blank" rel="noopener" href="https://sh-tsang.medium.com/review-swin-transformer-v2-scaling-up-capacity-and-resolution-401c28b02df8">Referance blog website</a></p>
-<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2111.09883">paper</a></p>
-<h2 id="V1-V2模型对比："><a href="#V1-V2模型对比：" class="headerlink" title="V1 V2模型对比："></a>V1 V2模型对比：</h2><p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346006.png" alt="image-20230818172517101"></p>
-<ol>
-<li><p>Residual-post-norm Method</p>
-<ol>
-<li><p>好处：增强训练的稳定性</p>
-</li>
-<li><p>Swin V2中的residual-post-norm</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346007.png" alt="image-20230818172747611"></p>
-<blockquote>
-<p>训练更稳定的实验数据依托：</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346008.png" alt="image-20230818173101101"></p>
-<p>Pre方法：Swin V1使用的normalization策略</p>
-<p>Post方法：Swin V2使用的normalization策略</p>
-<hr>
-<p>Figure 2应该从两个角度看：</p>
-<ol>
-<li>先看Pre方法下(节点用’●’表示)，随着模型规模增大，层数增加，输出值不断累加，深层输出和浅层输出幅值差很多，导致训练过程不稳定</li>
-<li>再看同一数据规模下(同一颜色的线条)，Pre方法的activation amplitudes更小，故训练更稳定</li>
-</ol>
-</blockquote>
-</li>
-</ol>
-</li>
-<li><p>Scaled Cosine Attention</p>
-<ol>
-<li><p>使用点积的方法计算相关性，一些blocks &amp; heads的attention map会受到小部分的像素对的支配，这个影响在使用residual-post-norm时更为显著（为什么？）</p>
-</li>
-<li><p>计算pixel i和j之间的相关性：</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346009.png" alt="image-20230818175331644"></p>
-<blockquote>
-<p>优势：milder attention value, naturally normalized function</p>
-</blockquote>
-</li>
-</ol>
-</li>
-<li><p>Scaling Up Window Resolution</p>
-<ol>
-<li><p>原始的方法：相对位置编码是[-M+1, M-1]，当跨不同窗口大小进行<strong>迁移学习</strong>时，预训练中学习到的相对位置偏差矩阵用于通过<strong>双三次插值</strong>来初始化微调时的偏差矩阵(windw size不同)。</p>
-</li>
-<li><p>CPB：通过两层MLP，取代双三次插值，因为用到了可学习的网络，更灵活，用于迁移学习更优</p>
-</li>
-<li><p>Log-Spaced CPB(CPB for Continous Positional Bias)</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346010.png" alt="image-20230818184757407"></p>
-<blockquote>
-<p>计算公式：<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346011.png" alt="image-20230818185012606"></p>
-<p>sign()是指出正负号的函数</p>
-<p>eg: 当从8×8 window size的预训练模型迁移到16×16 window size时，输入的相对位置偏移量的区间(input coordinate range)从[-7, 7] -&gt; [-15, 15] (V1不使用CPB)</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td></td>
-<td>extrapolation ratio(扩率)</td>
-</tr>
-<tr>
-<td>不使用CPB</td>
-<td>(15-7)&#x2F;7 &#x3D; <strong>1.14</strong></td>
-</tr>
-<tr>
-<td>Log-Spaced CPB</td>
-<td>ln(7+1)&#x3D;2.079, ln(15+1)&#x3D;2.773   (2.773-2.079)&#x2F;2.079 &#x3D; <strong>0.33</strong></td>
-</tr>
-</tbody></table>
-<p>总结：外扩率减小，Meta network(MLP)的输入维持在比较稳定的区间，保证最后产生的相对位置编码的准确性</p>
-</blockquote>
-</li>
-</ol>
-</li>
-<li><p>SimMIM进行自监督训练（目前不了解）</p>
-</li>
-<li><p>Ways to save GPU memory</p>
-<ol>
-<li>Zero-Redundancy Optimizer: 将模型参数和相应的optimization states分布到不同GPU上，<em>significantly</em> 节约显存开销</li>
-<li>Activation Check-Pointing: 减少Feature maps存储的开销，但会增长30%训练时间</li>
-<li>Sequential Self-Attention Computation: 取代了基于batch的self-attention预算。这个优化应用在前两个stage，减少显存开销，对训练时间影响小</li>
-</ol>
-</li>
-<li><p>model variant</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308200346012.png" alt="image-20230818180914168"></p>
-</li>
-</ol>
-
+    <div class="collection-year">
+      <span class="collection-header">2023</span>
     </div>
 
-    
-    
-    
-        
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
 
-<div>
-<ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>本文作者： </strong>lyhkk
-  </li>
-  <li class="post-copyright-link">
-    <strong>本文链接：</strong>
-    <a href="http://example.com/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" title="Swin Transformer V2论文笔记">http://example.com/2023/08/20/Swin-Transformer-V2论文笔记/</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
-  </li>
-</ul>
-</div>
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2023-07-05T23:55:57+08:00"
+              content="2023-07-05">
+          07-05
+        </time>
+      </div>
 
+      <div class="post-title">
+          <a class="post-title-link" href="/2023/07/05/C-STL/" itemprop="url">
+            <span itemprop="name">C++ STL</span>
+          </a>
+      </div>
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/Transformer/" rel="tag"># Transformer</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" rel="prev" title="Swin Transformer V1论文笔记">
-      <i class="fa fa-chevron-left"></i> Swin Transformer V1论文笔记
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2023/08/20/%E8%B7%91%E9%80%9Abeit%20v1%E7%9A%84%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/" rel="next" title="跑通Beit V1的语义分割任务">
-      跑通Beit V1的语义分割任务 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
+    </header>
   </article>
+
+
+    </div>
+  </div>
   
   
   
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/archives/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/archives/">1</a><span class="page-number current">2</span>
+  </nav>
 
 
 
@@ -445,7 +278,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#V1-V2%E6%A8%A1%E5%9E%8B%E5%AF%B9%E6%AF%94%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">V1 V2模型对比：</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
