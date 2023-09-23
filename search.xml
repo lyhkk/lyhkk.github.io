@@ -1,123 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>BEiT V1论文笔记</title>
-    <url>/2023/08/31/BEiT-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p><a href="https://arxiv.org/abs/2106.08254">paper reference</a></p>
-<p><a href="https://sh-tsang.medium.com/review-beit-bert-pre-training-of-image-transformers-c14a7ef7e295">note reference 1: BEiT</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/381345343">note reference 2: Self-supervised learning</a></p>
-<h2 id="Self-supervised-learning"><a href="#Self-supervised-learning" class="headerlink" title="Self-supervised learning"></a>Self-supervised learning</h2><ol>
-<li><strong>Overall impression</strong>: unsupervised  pretraining and supervised fine-tuning</li>
-<li><strong>Goals</strong>: The objective is to acquire <strong>a set of general feature representations</strong> during <strong>the pretraining phase</strong>, which can be further refined through the utilization of numerous labeled datasets <strong>in the downstream task</strong>.</li>
-<li>Masked Image Modeling (<em><strong>MIM</strong></em>) methods are proposed for <em><strong>self*-*supervised</strong></em> visual representation learning</li>
-</ol>
-<h2 id="BEiT-BERT-Pre-Training-of-Image-Transformers"><a href="#BEiT-BERT-Pre-Training-of-Image-Transformers" class="headerlink" title="BEiT: BERT Pre-Training of Image Transformers"></a><strong>BEiT: BERT Pre-Training of Image Transformers</strong></h2><h3 id="BEiT-Architecture"><a href="#BEiT-Architecture" class="headerlink" title="BEiT Architecture:"></a><strong>BEiT Architecture:</strong></h3><p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756921.png" alt="image-20230824100112299"></p>
-<ol>
-<li><p><strong>Overall Approach</strong></p>
-<ol>
-<li><p>Pre-training task: <code>MIM</code>(<strong>Masked Image Modeling</strong>) -&gt; inspired by <code>BERT</code></p>
-<blockquote>
-<p><em>During</em> <strong>pre-training</strong>, some proportion of <strong>image patches are randomly masked</strong>, and <strong>fed the corrupted input to Transformer.</strong> <em>The model</em>  <strong>learns to recover the visual tokens</strong> <em>of the original image,</em> <strong>instead of the raw pixels</strong> of masked patches.</p>
-</blockquote>
-<p><code>MIM</code> uses two views of each image</p>
-<ul>
-<li><strong>image patches</strong></li>
-<li><strong>visual tokens</strong></li>
-</ul>
-</li>
-<li><p>The input of BEiT: The image is split into <strong>a grid of patches</strong> that are the <strong>input representation of backbone</strong> <strong>Transformer</strong></p>
-</li>
-<li><p>The approach to <strong>tokenize</strong> an image: <strong>latent codes of discrete VAE</strong>(VAE is from <a href="https://sh-tsang.medium.com/review-dall-e-zero-shot-text-to-image-generation-f9de7a383374"><strong>DALL</strong>·E</a>)</p>
-</li>
-<li><p>The goal of pretraining: reinforce the model’s capacity to capture generic visual features.</p>
-</li>
-</ol>
-</li>
-<li><p><strong>Introduction of two image representations</strong></p>
-<ol>
-<li><p><strong>Image patches</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756923.png" alt="image-20230824103227012"></p>
-<ol>
-<li><p>The 2D image of the size H×W×C is split into <strong>a sequence of patches</strong> of size P<sup>2</sup>, while the number of patch is N&#x3D;HW&#x2F;P<sup>2</sup> patches</p>
-<blockquote>
-<p>image -&gt; patches</p>
-</blockquote>
-</li>
-<li><p>The image patches <em>xp</em> are <strong>flattened into vectors</strong> and are <strong>linearly projected</strong> which is similar to word embeddings in  BERT</p>
-<blockquote>
-<p>patches -&gt; patch embeddings</p>
-</blockquote>
-</li>
-</ol>
-</li>
-<li><p><strong>Visual tokens</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756924.png" alt="image-20230824103211423"></p>
-<ol>
-<li><p>The original image is represented as a sequence of tokens obtained by an <strong>image tokenizer</strong>, instead of raw pixels</p>
-<blockquote>
-<p><strong>visual tokens</strong> are <strong>discreate token indices</strong>, and the true patches can be refered respectively by <strong>the token indices and a visual codebook</strong></p>
-</blockquote>
-</li>
-<li><p>The <strong>image tokenizer</strong> learned by discreate variational autoencoder(dVAE), by DALL·E, is directly used.</p>
-<blockquote>
-<p>Learning process:</p>
-<p>By two modules <strong>tokenizer</strong> and <strong>decoder</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756925.png" alt="image-20230824104526023"></p>
-<p>visual codebook contains <strong>eigen vectors</strong> that represent various image patches.</p>
-</blockquote>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p><strong>ViT Backbone</strong></p>
-<ol>
-<li><p>Following ViT, Transformer backbone network is used</p>
-<blockquote>
-<p><strong>ViTBase</strong> is used, which is a 12-layer <a href="https://sh-tsang.medium.com/review-attention-is-all-you-need-transformer-96c787ecdec1">Transformer</a> with 768 hidden size, and 12 attention heads. The intermediate size of feed-forward networks is 3072.</p>
-</blockquote>
-</li>
-<li><p>The  fomula and architecture are shown below:</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756926.png" alt="image-20230824113010977"></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756927.png" alt="image-20230824112608619"></p>
-</li>
-</ol>
-</li>
-</ol>
-<h3 id="BEiT-Pretraning"><a href="#BEiT-Pretraning" class="headerlink" title="BEiT Pretraning"></a><strong>BEiT Pretraning</strong></h3><ol>
-<li><p><strong>MIM</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756928.png" alt="image-20230824113304695"></p>
-<ol>
-<li><p>As described above, <strong>approximately 40% image patches are randomly masked</strong>, where the masked patches are denoted as M. The masked patches are <strong>replaced with a learnable embedding e[M]</strong>.</p>
-</li>
-<li><p>After a L-layer Transformer, <strong>a softmax classifier</strong> is used to predict corresponding visual tokens</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756929.png" alt="image-20230824113737099"></p>
-</li>
-<li><p><em>pre-training objective</em>: <strong>maximize the log-likelihood of the correct visual tokens zi given the corrupted image</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756930.png" alt="image-20230824113835611"></p>
-</li>
-</ol>
-</li>
-<li><p><strong>Blockwise Masking</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756932.png" alt="image-20230824120716933"></p>
-</li>
-<li><p><strong>Why dVAE beats VAE</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756933.png" alt="image-20230824233709250"></p>
-<blockquote>
-<p>VAE: directly using pixel-level auto-encoding(<strong>continuous vector space to represent latent space</strong>) -&gt; foucus on short-range dependencies and high-frequency details</p>
-<p>dVAE: discrete visual tokens</p>
-</blockquote>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>Deep Learning</category>
-      </categories>
-      <tags>
-        <tag>Transformer</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Attention Is All You Need论文笔记</title>
     <url>/2023/08/14/Attention%20Is%20All%20You%20Need%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<p><a href="https://arxiv.org/abs/1706.03762">论文地址</a></p>
@@ -273,6 +156,123 @@
 <p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311057056.png" alt="image-20230825121059114"></p>
 </li>
 </ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Deep Learning</category>
+      </categories>
+      <tags>
+        <tag>Transformer</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>BEiT V1论文笔记</title>
+    <url>/2023/08/31/BEiT-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p><a href="https://arxiv.org/abs/2106.08254">paper reference</a></p>
+<p><a href="https://sh-tsang.medium.com/review-beit-bert-pre-training-of-image-transformers-c14a7ef7e295">note reference 1: BEiT</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/381345343">note reference 2: Self-supervised learning</a></p>
+<h2 id="Self-supervised-learning"><a href="#Self-supervised-learning" class="headerlink" title="Self-supervised learning"></a>Self-supervised learning</h2><ol>
+<li><strong>Overall impression</strong>: unsupervised  pretraining and supervised fine-tuning</li>
+<li><strong>Goals</strong>: The objective is to acquire <strong>a set of general feature representations</strong> during <strong>the pretraining phase</strong>, which can be further refined through the utilization of numerous labeled datasets <strong>in the downstream task</strong>.</li>
+<li>Masked Image Modeling (<em><strong>MIM</strong></em>) methods are proposed for <em><strong>self*-*supervised</strong></em> visual representation learning</li>
+</ol>
+<h2 id="BEiT-BERT-Pre-Training-of-Image-Transformers"><a href="#BEiT-BERT-Pre-Training-of-Image-Transformers" class="headerlink" title="BEiT: BERT Pre-Training of Image Transformers"></a><strong>BEiT: BERT Pre-Training of Image Transformers</strong></h2><h3 id="BEiT-Architecture"><a href="#BEiT-Architecture" class="headerlink" title="BEiT Architecture:"></a><strong>BEiT Architecture:</strong></h3><p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756921.png" alt="image-20230824100112299"></p>
+<ol>
+<li><p><strong>Overall Approach</strong></p>
+<ol>
+<li><p>Pre-training task: <code>MIM</code>(<strong>Masked Image Modeling</strong>) -&gt; inspired by <code>BERT</code></p>
+<blockquote>
+<p><em>During</em> <strong>pre-training</strong>, some proportion of <strong>image patches are randomly masked</strong>, and <strong>fed the corrupted input to Transformer.</strong> <em>The model</em>  <strong>learns to recover the visual tokens</strong> <em>of the original image,</em> <strong>instead of the raw pixels</strong> of masked patches.</p>
+</blockquote>
+<p><code>MIM</code> uses two views of each image</p>
+<ul>
+<li><strong>image patches</strong></li>
+<li><strong>visual tokens</strong></li>
+</ul>
+</li>
+<li><p>The input of BEiT: The image is split into <strong>a grid of patches</strong> that are the <strong>input representation of backbone</strong> <strong>Transformer</strong></p>
+</li>
+<li><p>The approach to <strong>tokenize</strong> an image: <strong>latent codes of discrete VAE</strong>(VAE is from <a href="https://sh-tsang.medium.com/review-dall-e-zero-shot-text-to-image-generation-f9de7a383374"><strong>DALL</strong>·E</a>)</p>
+</li>
+<li><p>The goal of pretraining: reinforce the model’s capacity to capture generic visual features.</p>
+</li>
+</ol>
+</li>
+<li><p><strong>Introduction of two image representations</strong></p>
+<ol>
+<li><p><strong>Image patches</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756923.png" alt="image-20230824103227012"></p>
+<ol>
+<li><p>The 2D image of the size H×W×C is split into <strong>a sequence of patches</strong> of size P<sup>2</sup>, while the number of patch is N&#x3D;HW&#x2F;P<sup>2</sup> patches</p>
+<blockquote>
+<p>image -&gt; patches</p>
+</blockquote>
+</li>
+<li><p>The image patches <em>xp</em> are <strong>flattened into vectors</strong> and are <strong>linearly projected</strong> which is similar to word embeddings in  BERT</p>
+<blockquote>
+<p>patches -&gt; patch embeddings</p>
+</blockquote>
+</li>
+</ol>
+</li>
+<li><p><strong>Visual tokens</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756924.png" alt="image-20230824103211423"></p>
+<ol>
+<li><p>The original image is represented as a sequence of tokens obtained by an <strong>image tokenizer</strong>, instead of raw pixels</p>
+<blockquote>
+<p><strong>visual tokens</strong> are <strong>discreate token indices</strong>, and the true patches can be refered respectively by <strong>the token indices and a visual codebook</strong></p>
+</blockquote>
+</li>
+<li><p>The <strong>image tokenizer</strong> learned by discreate variational autoencoder(dVAE), by DALL·E, is directly used.</p>
+<blockquote>
+<p>Learning process:</p>
+<p>By two modules <strong>tokenizer</strong> and <strong>decoder</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756925.png" alt="image-20230824104526023"></p>
+<p>visual codebook contains <strong>eigen vectors</strong> that represent various image patches.</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><strong>ViT Backbone</strong></p>
+<ol>
+<li><p>Following ViT, Transformer backbone network is used</p>
+<blockquote>
+<p><strong>ViTBase</strong> is used, which is a 12-layer <a href="https://sh-tsang.medium.com/review-attention-is-all-you-need-transformer-96c787ecdec1">Transformer</a> with 768 hidden size, and 12 attention heads. The intermediate size of feed-forward networks is 3072.</p>
+</blockquote>
+</li>
+<li><p>The  fomula and architecture are shown below:</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756926.png" alt="image-20230824113010977"></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756927.png" alt="image-20230824112608619"></p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="BEiT-Pretraning"><a href="#BEiT-Pretraning" class="headerlink" title="BEiT Pretraning"></a><strong>BEiT Pretraning</strong></h3><ol>
+<li><p><strong>MIM</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756928.png" alt="image-20230824113304695"></p>
+<ol>
+<li><p>As described above, <strong>approximately 40% image patches are randomly masked</strong>, where the masked patches are denoted as M. The masked patches are <strong>replaced with a learnable embedding e[M]</strong>.</p>
+</li>
+<li><p>After a L-layer Transformer, <strong>a softmax classifier</strong> is used to predict corresponding visual tokens</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756929.png" alt="image-20230824113737099"></p>
+</li>
+<li><p><em>pre-training objective</em>: <strong>maximize the log-likelihood of the correct visual tokens zi given the corrupted image</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756930.png" alt="image-20230824113835611"></p>
+</li>
+</ol>
+</li>
+<li><p><strong>Blockwise Masking</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756932.png" alt="image-20230824120716933"></p>
+</li>
+<li><p><strong>Why dVAE beats VAE</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308311756933.png" alt="image-20230824233709250"></p>
+<blockquote>
+<p>VAE: directly using pixel-level auto-encoding(<strong>continuous vector space to represent latent space</strong>) -&gt; foucus on short-range dependencies and high-frequency details</p>
+<p>dVAE: discrete visual tokens</p>
+</blockquote>
 </li>
 </ol>
 ]]></content>
@@ -440,6 +440,92 @@
       </tags>
   </entry>
   <entry>
+    <title>Swin Transformer V1论文笔记</title>
+    <url>/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p><a href="https://arxiv.org/abs/2103.14030">paper</a></p>
+<h2 id="Swin-Transformer-V1网络结构："><a href="#Swin-Transformer-V1网络结构：" class="headerlink" title="Swin-Transformer-V1网络结构："></a><strong>Swin-Transformer-V1网络结构：</strong></h2><p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147454.png" alt="image-20230814090947639"></p>
+<h3 id="不同参数量级的Swin的设置："><a href="#不同参数量级的Swin的设置：" class="headerlink" title="不同参数量级的Swin的设置："></a><strong>不同参数量级的Swin的设置：</strong></h3><p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147455.png" alt="image-20230814095932385"></p>
+<h3 id="网络结构解读："><a href="#网络结构解读：" class="headerlink" title="网络结构解读："></a><strong>网络结构解读：</strong></h3><ol>
+<li><p>Patch Partition: 为每一个图片分为不同patch</p>
+</li>
+<li><p>Linear Embedding: 用于Stage 1: 将通道数48映射到任意的C，很像序列attention的第一步：将符号信息-&gt;向量</p>
+</li>
+<li><p>Patch merging: 降采样，比如stage2: merging的作法是，将feature map切patch，为[H&#x2F;8, W&#x2F;8]，channel维变为4C，[B, H&#x2F;8, W&#x2F;8, 4C]再通过一个线性层将4C映射到2C</p>
+</li>
+<li><p>Window partition: 将<code>(B,H,W,C)</code>的图片划分为<code>(num_windows*B, window_size, window_size, C)</code></p>
+</li>
+<li><table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">Window Partition</th>
+<th align="center">computation skills</th>
+<th align="center">context</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">W-MSA</td>
+<td align="center">regular</td>
+<td align="center">–</td>
+<td align="center">only window</td>
+</tr>
+<tr>
+<td align="center">Sw-MSA</td>
+<td align="center">shifted</td>
+<td align="center">cyclic shift</td>
+<td align="center">only window</td>
+</tr>
+<tr>
+<td align="center">MSA</td>
+<td align="center">regular</td>
+<td align="center">–</td>
+<td align="center">global</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>Layer l - regular partition                                   Layer l+1 - shifted partition</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147457.png" alt="image-20230814092813118"></p>
+<p>shifted window <em>Pros</em>   克服了窗口间缺乏connections的弱点</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147458.png" alt="image-20230814093001309"></p>
+<p>无计算技巧时的shifted window计算量：</p>
+<p>以Figure 2为例：regular计算量是2×2的窗口数。而shifted如果不用cyclic技巧，就需要加Pad，将所有窗口都变为4×4Patch的窗口大小，再计算，所以计算量就是3×3的窗口数，计算量×2.25</p>
+<p><code>Cyclic shift computation skill</code>: 只用4 windows的计算量，得到9 windows的self-attention结果</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147459.png" alt="image-20230814094808828"></p>
+<p>这样的话计算量还是2×2的窗口数，而且加入了窗口间的connection</p>
+<p><code>masked MSA</code>: 先明确<code>window-based self-attention</code>机制是窗口内部j计算attention，按照<code>shifted window partition</code>的分割方法，例：A模块即使被<code>cyclic shift</code>到图像的下方，也只能和A的转置进行计算attention，不然如果A是天空，灰色部分是地面，shift后A矩阵和灰色部分的矩阵的点乘得到的结果是不合理的，故计算的时候需要<code>mask</code>，负责遮住A与非A部分的矩阵点乘结果。这也符合我们对<code>computation skill</code>的理解，加入了<code>cyclic shift</code>的<code>Sw-MSA</code>与<code>有pad的W-MSA</code>计算的attention结果相同</p>
+<p><code>reverse cyclic shift</code>: 将A,B,C复位</p>
+</blockquote>
+</li>
+<li><p>Relative position bias</p>
+<ol>
+<li><p>修改后的Attention(Q,K,V)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147460.png" alt="image-20230816110225146"></p>
+<blockquote>
+<p>B是[M<sup>2</sup>, M<sup>2</sup>]大小的矩阵</p>
+</blockquote>
+</li>
+<li><p>给一个Window的不同位置的patch加一个位置编码（<a href="https://zhuanlan.zhihu.com/p/507105020">reference blog</a>）</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147461.png" alt="image-20230816110001915"></p>
+<blockquote>
+<p>拉成1维合并后 + M-1 -&gt; 索引非负</p>
+<p>行标×(2M-1) 可以区分开关于主对角线对称的位置，并且对结果加和，区间为[0,8]，这个结果可以作为<code>relative_position_bias_table</code>的索引</p>
+<p>table怎么计算：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">relative_position_bias_table = nn.Parameter(torch.zeros((<span class="number">2</span> * window_size[<span class="number">0</span>] - <span class="number">1</span>) * (<span class="number">2</span> * window_size[<span class="number">1</span>] - <span class="number">1</span>)))</span><br><span class="line">trunc_normal_(relative_position_bias_table, std=<span class="number">.02</span>) <span class="comment"># 正态分布应该是为了控制相对位置编码在(-1, 1)之间，位置编码的原则可以看我Attention is all you need的论文笔记</span></span><br></pre></td></tr></table></figure>
+
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Deep Learning</category>
+      </categories>
+      <tags>
+        <tag>Transformer</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Swin Transformer V2论文笔记</title>
     <url>/2023/08/20/Swin-Transformer-V2%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<p><a href="https://sh-tsang.medium.com/review-swin-transformer-v2-scaling-up-capacity-and-resolution-401c28b02df8">Referance blog website</a></p>
@@ -538,92 +624,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Swin Transformer V1论文笔记</title>
-    <url>/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p><a href="https://arxiv.org/abs/2103.14030">paper</a></p>
-<h2 id="Swin-Transformer-V1网络结构："><a href="#Swin-Transformer-V1网络结构：" class="headerlink" title="Swin-Transformer-V1网络结构："></a><strong>Swin-Transformer-V1网络结构：</strong></h2><p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147454.png" alt="image-20230814090947639"></p>
-<h3 id="不同参数量级的Swin的设置："><a href="#不同参数量级的Swin的设置：" class="headerlink" title="不同参数量级的Swin的设置："></a><strong>不同参数量级的Swin的设置：</strong></h3><p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147455.png" alt="image-20230814095932385"></p>
-<h3 id="网络结构解读："><a href="#网络结构解读：" class="headerlink" title="网络结构解读："></a><strong>网络结构解读：</strong></h3><ol>
-<li><p>Patch Partition: 为每一个图片分为不同patch</p>
-</li>
-<li><p>Linear Embedding: 用于Stage 1: 将通道数48映射到任意的C，很像序列attention的第一步：将符号信息-&gt;向量</p>
-</li>
-<li><p>Patch merging: 降采样，比如stage2: merging的作法是，将feature map切patch，为[H&#x2F;8, W&#x2F;8]，channel维变为4C，[B, H&#x2F;8, W&#x2F;8, 4C]再通过一个线性层将4C映射到2C</p>
-</li>
-<li><p>Window partition: 将<code>(B,H,W,C)</code>的图片划分为<code>(num_windows*B, window_size, window_size, C)</code></p>
-</li>
-<li><table>
-<thead>
-<tr>
-<th align="center"></th>
-<th align="center">Window Partition</th>
-<th align="center">computation skills</th>
-<th align="center">context</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">W-MSA</td>
-<td align="center">regular</td>
-<td align="center">–</td>
-<td align="center">only window</td>
-</tr>
-<tr>
-<td align="center">Sw-MSA</td>
-<td align="center">shifted</td>
-<td align="center">cyclic shift</td>
-<td align="center">only window</td>
-</tr>
-<tr>
-<td align="center">MSA</td>
-<td align="center">regular</td>
-<td align="center">–</td>
-<td align="center">global</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p>Layer l - regular partition                                   Layer l+1 - shifted partition</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147457.png" alt="image-20230814092813118"></p>
-<p>shifted window <em>Pros</em>   克服了窗口间缺乏connections的弱点</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147458.png" alt="image-20230814093001309"></p>
-<p>无计算技巧时的shifted window计算量：</p>
-<p>以Figure 2为例：regular计算量是2×2的窗口数。而shifted如果不用cyclic技巧，就需要加Pad，将所有窗口都变为4×4Patch的窗口大小，再计算，所以计算量就是3×3的窗口数，计算量×2.25</p>
-<p><code>Cyclic shift computation skill</code>: 只用4 windows的计算量，得到9 windows的self-attention结果</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147459.png" alt="image-20230814094808828"></p>
-<p>这样的话计算量还是2×2的窗口数，而且加入了窗口间的connection</p>
-<p><code>masked MSA</code>: 先明确<code>window-based self-attention</code>机制是窗口内部j计算attention，按照<code>shifted window partition</code>的分割方法，例：A模块即使被<code>cyclic shift</code>到图像的下方，也只能和A的转置进行计算attention，不然如果A是天空，灰色部分是地面，shift后A矩阵和灰色部分的矩阵的点乘得到的结果是不合理的，故计算的时候需要<code>mask</code>，负责遮住A与非A部分的矩阵点乘结果。这也符合我们对<code>computation skill</code>的理解，加入了<code>cyclic shift</code>的<code>Sw-MSA</code>与<code>有pad的W-MSA</code>计算的attention结果相同</p>
-<p><code>reverse cyclic shift</code>: 将A,B,C复位</p>
-</blockquote>
-</li>
-<li><p>Relative position bias</p>
-<ol>
-<li><p>修改后的Attention(Q,K,V)</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147460.png" alt="image-20230816110225146"></p>
-<blockquote>
-<p>B是[M<sup>2</sup>, M<sup>2</sup>]大小的矩阵</p>
-</blockquote>
-</li>
-<li><p>给一个Window的不同位置的patch加一个位置编码（<a href="https://zhuanlan.zhihu.com/p/507105020">reference blog</a>）</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308161147461.png" alt="image-20230816110001915"></p>
-<blockquote>
-<p>拉成1维合并后 + M-1 -&gt; 索引非负</p>
-<p>行标×(2M-1) 可以区分开关于主对角线对称的位置，并且对结果加和，区间为[0,8]，这个结果可以作为<code>relative_position_bias_table</code>的索引</p>
-<p>table怎么计算：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">relative_position_bias_table = nn.Parameter(torch.zeros((<span class="number">2</span> * window_size[<span class="number">0</span>] - <span class="number">1</span>) * (<span class="number">2</span> * window_size[<span class="number">1</span>] - <span class="number">1</span>)))</span><br><span class="line">trunc_normal_(relative_position_bias_table, std=<span class="number">.02</span>) <span class="comment"># 正态分布应该是为了控制相对位置编码在(-1, 1)之间，位置编码的原则可以看我Attention is all you need的论文笔记</span></span><br></pre></td></tr></table></figure>
-
-</blockquote>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>Deep Learning</category>
-      </categories>
-      <tags>
-        <tag>Transformer</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ViT Adapter论文笔记</title>
     <url>/2023/08/29/ViT-Adapter%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<h2 id="ViT-Adapter网络结构学习"><a href="#ViT-Adapter网络结构学习" class="headerlink" title="ViT Adapter网络结构学习"></a>ViT Adapter网络结构学习</h2><p><a href="https://arxiv.org/abs/2205.08534">Paper reference</a></p>
@@ -681,6 +681,84 @@
       </categories>
       <tags>
         <tag>Transformer</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>每天一条Linux命令</title>
+    <url>/2023/09/22/%E6%AF%8F%E5%A4%A9%E4%B8%80%E6%9D%A1Linux%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<h4 id="9-x2F-22-curl"><a href="#9-x2F-22-curl" class="headerlink" title="9&#x2F;22 - curl"></a>9&#x2F;22 - curl</h4><ol>
+<li><p>curl是<strong>利用URL语法的网络请求工具</strong>，支持HTTP, HTTPS, FTP等协议</p>
+<blockquote>
+<p><mark>HTTP和HTTPS</mark></p>
+<p>HTTPS全称为<code>Hypertext Transfer Protocol Secure</code>, 与 HTTP 协议相比，HTTPS 协议在通信过程中引入了 <code>SSL/TLS 协议</code>来实现安全传输。<code>SSL/TLS 协议</code>使用公钥加密和私钥解密的算法，对传输的数据进行加密，同时使用数字证书对服务器的身份进行认证。这样可以确保客户端和服务器之间的通信安全和可靠。</p>
+<p>PS: 我们在URL中看到<code>https://或者http://</code>, 它被称为 URL 的协议头（scheme），表示使用的协议类型。URL的协议类型还包括(FTP, SMTP, POP3, IMAP, ssh, Telnet, DNS, JDBC)，但不是每一个协议头都可以通过curl直接拉取对应URL的内容(eg: <code>curl smtp://smtp.gmail.com</code> -&gt; 发出GET请求，无法直接获取到目标服务器的内容，而是返回了服务器的响应信息)</p>
+</blockquote>
+</li>
+<li><p><strong>HTTP常见请求</strong></p>
+<p><code>curl &lt;URL&gt;</code> (默认发出GET请求)</p>
+<p><code>curl -XPOST &lt;URL&gt; -d  &quot;需要嵌入的data&quot;</code> (-X指定了发出的http请求的方式是POST, 有两种写法：<code>-X POST</code>或者 <code>-XPOST</code>)</p>
+<blockquote>
+<p><mark>GET &amp; POST &amp; PUT &amp; DELETE</mark></p>
+<p>四种http请求方式</p>
+<ul>
+<li>GET：用于请求获取指定资源的信息。通过 GET 方法发送的请求，服务器将返回请求的资源。</li>
+<li>POST：用于在服务器上创建新的资源。通过 POST 方法发送的请求，服务器将根据请求中的数据创建新的资源，并返回相应的信息。</li>
+<li>PUT：用于更新指定资源的信息。通过 PUT 方法发送的请求，服务器将使用请求中的数据更新指定的资源。</li>
+<li>DELETE：用于删除指定的资源。通过 DELETE 方法发送的请求，服务器将删除指定的资源。</li>
+</ul>
+</blockquote>
+</li>
+<li><p><strong>HTTP首部</strong></p>
+<p><code>curl &lt;URL&gt; -H 首部</code> (可以自定义HTTP请求的首部，格式为：-H “字段名: 值”，可以修改多个字段，只需要使用多个-H即可)</p>
+<p><code>curl -I &lt;URL&gt;</code> 获得响应的所有首部的信息</p>
+<blockquote>
+<p><mark>HTTP首部</mark></p>
+<p>HTTP 首部可以分为两类：<strong>请求首部和响应首部</strong>。下面是一些常见的 HTTP 首部示例：</p>
+<p>请求首部：</p>
+<ul>
+<li><code>Host</code>：指定要访问的服务器主机名和端口号。</li>
+<li><code>User-Agent</code>：标识发起请求的用户代理（如浏览器、爬虫等）。</li>
+<li><code>Content-Type</code>：指定请求体的媒体类型。</li>
+<li><code>Authorization</code>：提供对资源的访问授权凭证。</li>
+</ul>
+<p>响应首部：</p>
+<ul>
+<li><code>Content-Type</code>：指定响应体的媒体类型。</li>
+<li><code>Content-Length</code>：指定响应体的长度。</li>
+<li><code>Set-Cookie</code>：在响应中设置一个 Cookie。</li>
+<li><code>Location</code>：指示客户端重定向到的 URL。</li>
+</ul>
+<p>此外，还有一些其他重要的首部，如 <code>Cache-Control</code>、<code>ETag</code>、<code>Last-Modified</code> 等，用于缓存控制和条件请求。</p>
+</blockquote>
+</li>
+<li><p><strong>文件下载</strong></p>
+<p><code>curl -O &lt;URL&gt;</code> (正常下载)</p>
+<p><code>curl -o 文件名 &lt;URL&gt;</code> (下载到特定文件内)</p>
+<p><code>curl --limit-rate 速度 &lt;URL&gt;</code> (下载大文件需要控制下载速度，如果下载被中断，使用<code>curl -C - &lt;URL&gt;</code>可以恢复下载)</p>
+</li>
+<li><p><strong>连接与测试</strong></p>
+<p><code>curl -L &lt;URL&gt;</code> (curl默认不会跟随重定向，所以要有些网站无法访问，-L解决问题)</p>
+<p><code>curl -v &lt;URL&gt;</code> (将连接时候的握手信息，请求和响应的首部信息打印出来，可以看哪里出错)</p>
+<p><code>curl --proxy 协议头://用户名:密码@代理地址:端口 &lt;URL&gt;</code></p>
+</li>
+<li><p><strong>FTP相关</strong></p>
+<p><code>curl -u 用户名:密码 -O ftp://server/...</code> (认证+下载)</p>
+<p><code>curl -u 用户名:密码 -o 文件名 ftp://server/...</code> </p>
+<p><code>curl -u 用户名:密码 -T 文件名 ftp://server/...</code> (认证+上传) </p>
+<blockquote>
+<p><mark>FTP</mark></p>
+<p>FTP有<code>主动模式</code>与<code>被动模式</code></p>
+<p><code>主动模式</code>: FTP 客户端（通常是本地计算机）发起与 FTP 服务器的连接。客户端随机选择一个未使用的本地端口（N&gt;1023），并通过这个端口与服务器的控制端口（通常是端口 21）建立连接。然后，客户端通过控制连接发送 PORT 命令，其中包含了客户端数据连接的 IP 地址和端口号。服务器从该指定的数据端口向客户端的数据端口发起连接，进行数据传输。(<strong>curl使用FTP传输默认为主动模式, <code>curl -P 端口</code>可以指定端口</strong>)</p>
+<p><code>被动模式</code>: 在被动模式下，FTP 客户端发起与 FTP 服务器的连接。客户端通过控制连接发送 PASV 命令，服务器在一个指定的非特权端口（通常是端口号大于 1023）上监听连接。然后，服务器将其 IP 地址和监听的数据端口号作为响应发送给客户端。客户端随后通过数据连接的新端口与服务器的数据端口建立连接，并进行数据传输。(<strong><code>curl --ftp-pasv</code>且不使用<code>-P</code>和<code>--ftp-port</code>可以切换到被动模式</strong>)</p>
+</blockquote>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Basic_Skills</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
       </tags>
   </entry>
   <entry>
@@ -756,6 +834,28 @@
 <p><strong>附录：</strong></p>
 <p>validation过程中，各类别的mIoU和Acc如下：</p>
 <figure class="highlight json"><table><tr><td class="code"><pre><span class="line">+---------------------+-------+-------+</span><br><span class="line">| Class               | IoU   | Acc   |</span><br><span class="line">+---------------------+-------+-------+</span><br><span class="line">| wall                | <span class="number">75.88</span> | <span class="number">87.82</span> |</span><br><span class="line">| building            | <span class="number">81.5</span>  | <span class="number">91.98</span> |</span><br><span class="line">| sky                 | <span class="number">93.95</span> | <span class="number">97.18</span> |</span><br><span class="line">| floor               | <span class="number">80.19</span> | <span class="number">90.6</span>  |</span><br><span class="line">| tree                | <span class="number">74.04</span> | <span class="number">87.05</span> |</span><br><span class="line">| ceiling             | <span class="number">82.28</span> | <span class="number">90.21</span> |</span><br><span class="line">| road                | <span class="number">81.98</span> | <span class="number">89.34</span> |</span><br><span class="line">| bed                 | <span class="number">86.94</span> | <span class="number">95.45</span> |</span><br><span class="line">| windowpane          | <span class="number">60.9</span>  | <span class="number">77.16</span> |</span><br><span class="line">| grass               | <span class="number">67.34</span> | <span class="number">83.15</span> |</span><br><span class="line">| cabinet             | <span class="number">59.51</span> | <span class="number">72.18</span> |</span><br><span class="line">| sidewalk            | <span class="number">64.31</span> | <span class="number">80.8</span>  |</span><br><span class="line">| person              | <span class="number">78.34</span> | <span class="number">90.42</span> |</span><br><span class="line">| earth               | <span class="number">37.37</span> | <span class="number">52.52</span> |</span><br><span class="line">| door                | <span class="number">45.28</span> | <span class="number">59.92</span> |</span><br><span class="line">| table               | <span class="number">59.22</span> | <span class="number">76.1</span>  |</span><br><span class="line">| mountain            | <span class="number">57.24</span> | <span class="number">71.79</span> |</span><br><span class="line">| plant               | <span class="number">52.32</span> | <span class="number">63.37</span> |</span><br><span class="line">| curtain             | <span class="number">69.82</span> | <span class="number">83.09</span> |</span><br><span class="line">| chair               | <span class="number">54.96</span> | <span class="number">69.21</span> |</span><br><span class="line">| car                 | <span class="number">83.77</span> | <span class="number">91.67</span> |</span><br><span class="line">| water               | <span class="number">47.62</span> | <span class="number">61.96</span> |</span><br><span class="line">| painting            | <span class="number">72.41</span> | <span class="number">86.03</span> |</span><br><span class="line">| sofa                | <span class="number">60.08</span> | <span class="number">76.23</span> |</span><br><span class="line">| shelf               | <span class="number">43.32</span> | <span class="number">63.98</span> |</span><br><span class="line">| house               | <span class="number">49.56</span> | <span class="number">62.8</span>  |</span><br><span class="line">| sea                 | <span class="number">51.04</span> | <span class="number">70.59</span> |</span><br><span class="line">| mirror              | <span class="number">62.54</span> | <span class="number">69.18</span> |</span><br><span class="line">| rug                 | <span class="number">60.32</span> | <span class="number">67.46</span> |</span><br><span class="line">| field               | <span class="number">31.73</span> | <span class="number">45.61</span> |</span><br><span class="line">| armchair            | <span class="number">37.61</span> | <span class="number">57.33</span> |</span><br><span class="line">| seat                | <span class="number">59.81</span> | <span class="number">79.95</span> |</span><br><span class="line">| fence               | <span class="number">42.07</span> | <span class="number">56.82</span> |</span><br><span class="line">| desk                | <span class="number">49.49</span> | <span class="number">66.97</span> |</span><br><span class="line">| rock                | <span class="number">47.33</span> | <span class="number">73.48</span> |</span><br><span class="line">| wardrobe            | <span class="number">49.47</span> | <span class="number">68.13</span> |</span><br><span class="line">| lamp                | <span class="number">60.04</span> | <span class="number">71.42</span> |</span><br><span class="line">| bathtub             | <span class="number">75.56</span> | <span class="number">81.97</span> |</span><br><span class="line">| railing             | <span class="number">32.42</span> | <span class="number">47.61</span> |</span><br><span class="line">| cushion             | <span class="number">54.0</span>  | <span class="number">68.56</span> |</span><br><span class="line">| base                | <span class="number">30.54</span> | <span class="number">42.64</span> |</span><br><span class="line">| box                 | <span class="number">24.21</span> | <span class="number">29.27</span> |</span><br><span class="line">| column              | <span class="number">43.06</span> | <span class="number">53.74</span> |</span><br><span class="line">| signboard           | <span class="number">36.02</span> | <span class="number">48.73</span> |</span><br><span class="line">| chest of drawers    | <span class="number">39.78</span> | <span class="number">55.26</span> |</span><br><span class="line">| counter             | <span class="number">24.38</span> | <span class="number">34.5</span>  |</span><br><span class="line">| sand                | <span class="number">49.0</span>  | <span class="number">61.36</span> |</span><br><span class="line">| sink                | <span class="number">72.87</span> | <span class="number">79.28</span> |</span><br><span class="line">| skyscraper          | <span class="number">55.51</span> | <span class="number">75.59</span> |</span><br><span class="line">| fireplace           | <span class="number">77.31</span> | <span class="number">86.69</span> |</span><br><span class="line">| refrigerator        | <span class="number">73.98</span> | <span class="number">85.11</span> |</span><br><span class="line">| grandstand          | <span class="number">36.52</span> | <span class="number">66.35</span> |</span><br><span class="line">| path                | <span class="number">25.78</span> | <span class="number">36.24</span> |</span><br><span class="line">| stairs              | <span class="number">30.06</span> | <span class="number">36.85</span> |</span><br><span class="line">| runway              | <span class="number">64.37</span> | <span class="number">86.92</span> |</span><br><span class="line">| case                | <span class="number">36.91</span> | <span class="number">47.58</span> |</span><br><span class="line">| pool table          | <span class="number">91.72</span> | <span class="number">95.42</span> |</span><br><span class="line">| pillow              | <span class="number">54.05</span> | <span class="number">61.68</span> |</span><br><span class="line">| screen door         | <span class="number">57.43</span> | <span class="number">76.01</span> |</span><br><span class="line">| stairway            | <span class="number">28.86</span> | <span class="number">37.94</span> |</span><br><span class="line">| river               | <span class="number">7.04</span>  | <span class="number">18.76</span> |</span><br><span class="line">| bridge              | <span class="number">33.95</span> | <span class="number">43.37</span> |</span><br><span class="line">| bookcase            | <span class="number">43.84</span> | <span class="number">63.89</span> |</span><br><span class="line">| blind               | <span class="number">42.74</span> | <span class="number">47.66</span> |</span><br><span class="line">| coffee table        | <span class="number">56.26</span> | <span class="number">80.03</span> |</span><br><span class="line">| toilet              | <span class="number">84.39</span> | <span class="number">91.65</span> |</span><br><span class="line">| flower              | <span class="number">41.4</span>  | <span class="number">57.24</span> |</span><br><span class="line">| book                | <span class="number">46.29</span> | <span class="number">63.28</span> |</span><br><span class="line">| hill                | <span class="number">6.21</span>  | <span class="number">10.59</span> |</span><br><span class="line">| bench               | <span class="number">50.84</span> | <span class="number">58.05</span> |</span><br><span class="line">| countertop          | <span class="number">47.47</span> | <span class="number">65.09</span> |</span><br><span class="line">| stove               | <span class="number">77.27</span> | <span class="number">82.83</span> |</span><br><span class="line">| palm                | <span class="number">49.09</span> | <span class="number">80.35</span> |</span><br><span class="line">| kitchen island      | <span class="number">35.46</span> | <span class="number">66.41</span> |</span><br><span class="line">| computer            | <span class="number">60.62</span> | <span class="number">69.92</span> |</span><br><span class="line">| swivel chair        | <span class="number">43.89</span> | <span class="number">58.2</span>  |</span><br><span class="line">| boat                | <span class="number">44.83</span> | <span class="number">51.58</span> |</span><br><span class="line">| bar                 | <span class="number">33.78</span> | <span class="number">46.42</span> |</span><br><span class="line">| arcade machine      | <span class="number">42.46</span> | <span class="number">45.03</span> |</span><br><span class="line">| hovel               | <span class="number">27.84</span> | <span class="number">33.58</span> |</span><br><span class="line">| bus                 | <span class="number">85.5</span>  | <span class="number">95.7</span>  |</span><br><span class="line">| towel               | <span class="number">64.81</span> | <span class="number">77.75</span> |</span><br><span class="line">| light               | <span class="number">51.2</span>  | <span class="number">57.51</span> |</span><br><span class="line">| truck               | <span class="number">38.52</span> | <span class="number">49.88</span> |</span><br><span class="line">| tower               | <span class="number">12.59</span> | <span class="number">16.34</span> |</span><br><span class="line">| chandelier          | <span class="number">67.62</span> | <span class="number">83.59</span> |</span><br><span class="line">| awning              | <span class="number">24.46</span> | <span class="number">29.84</span> |</span><br><span class="line">| streetlight         | <span class="number">22.69</span> | <span class="number">27.9</span>  |</span><br><span class="line">| booth               | <span class="number">39.14</span> | <span class="number">43.55</span> |</span><br><span class="line">| television receiver | <span class="number">63.52</span> | <span class="number">76.73</span> |</span><br><span class="line">| airplane            | <span class="number">54.17</span> | <span class="number">68.22</span> |</span><br><span class="line">| dirt track          | <span class="number">9.49</span>  | <span class="number">20.3</span>  |</span><br><span class="line">| apparel             | <span class="number">41.61</span> | <span class="number">58.49</span> |</span><br><span class="line">| pole                | <span class="number">22.26</span> | <span class="number">31.02</span> |</span><br><span class="line">| land                | <span class="number">3.74</span>  | <span class="number">5.16</span>  |</span><br><span class="line">| bannister           | <span class="number">9.37</span>  | <span class="number">11.57</span> |</span><br><span class="line">| escalator           | <span class="number">46.01</span> | <span class="number">61.15</span> |</span><br><span class="line">| ottoman             | <span class="number">46.64</span> | <span class="number">61.2</span>  |</span><br><span class="line">| bottle              | <span class="number">39.34</span> | <span class="number">59.83</span> |</span><br><span class="line">| buffet              | <span class="number">29.0</span>  | <span class="number">32.67</span> |</span><br><span class="line">| poster              | <span class="number">26.59</span> | <span class="number">36.56</span> |</span><br><span class="line">| stage               | <span class="number">19.5</span>  | <span class="number">30.8</span>  |</span><br><span class="line">| van                 | <span class="number">42.08</span> | <span class="number">56.7</span>  |</span><br><span class="line">| ship                | <span class="number">31.27</span> | <span class="number">47.3</span>  |</span><br><span class="line">| fountain            | <span class="number">21.48</span> | <span class="number">22.08</span> |</span><br><span class="line">| conveyer belt       | <span class="number">56.6</span>  | <span class="number">69.16</span> |</span><br><span class="line">| canopy              | <span class="number">6.03</span>  | <span class="number">9.86</span>  |</span><br><span class="line">| washer              | <span class="number">74.13</span> | <span class="number">76.94</span> |</span><br><span class="line">| plaything           | <span class="number">22.11</span> | <span class="number">33.75</span> |</span><br><span class="line">| swimming pool       | <span class="number">57.93</span> | <span class="number">75.19</span> |</span><br><span class="line">| stool               | <span class="number">36.61</span> | <span class="number">54.75</span> |</span><br><span class="line">| barrel              | <span class="number">38.85</span> | <span class="number">65.2</span>  |</span><br><span class="line">| basket              | <span class="number">29.85</span> | <span class="number">39.16</span> |</span><br><span class="line">| waterfall           | <span class="number">61.86</span> | <span class="number">71.23</span> |</span><br><span class="line">| tent                | <span class="number">91.31</span> | <span class="number">98.67</span> |</span><br><span class="line">| bag                 | <span class="number">14.61</span> | <span class="number">18.94</span> |</span><br><span class="line">| minibike            | <span class="number">70.54</span> | <span class="number">82.9</span>  |</span><br><span class="line">| cradle              | <span class="number">69.39</span> | <span class="number">84.86</span> |</span><br><span class="line">| oven                | <span class="number">59.75</span> | <span class="number">75.28</span> |</span><br><span class="line">| ball                | <span class="number">39.28</span> | <span class="number">49.13</span> |</span><br><span class="line">| food                | <span class="number">44.82</span> | <span class="number">55.14</span> |</span><br><span class="line">| step                | <span class="number">15.71</span> | <span class="number">19.1</span>  |</span><br><span class="line">| tank                | <span class="number">56.6</span>  | <span class="number">59.83</span> |</span><br><span class="line">| trade name          | <span class="number">26.23</span> | <span class="number">30.57</span> |</span><br><span class="line">| microwave           | <span class="number">84.77</span> | <span class="number">92.18</span> |</span><br><span class="line">| pot                 | <span class="number">43.37</span> | <span class="number">50.01</span> |</span><br><span class="line">| animal              | <span class="number">50.4</span>  | <span class="number">52.17</span> |</span><br><span class="line">| bicycle             | <span class="number">55.69</span> | <span class="number">76.24</span> |</span><br><span class="line">| lake                | <span class="number">42.86</span> | <span class="number">64.07</span> |</span><br><span class="line">| dishwasher          | <span class="number">62.77</span> | <span class="number">69.52</span> |</span><br><span class="line">| screen              | <span class="number">56.03</span> | <span class="number">74.51</span> |</span><br><span class="line">| blanket             | <span class="number">9.13</span>  | <span class="number">10.76</span> |</span><br><span class="line">| sculpture           | <span class="number">53.36</span> | <span class="number">74.64</span> |</span><br><span class="line">| hood                | <span class="number">58.87</span> | <span class="number">69.21</span> |</span><br><span class="line">| sconce              | <span class="number">43.44</span> | <span class="number">52.69</span> |</span><br><span class="line">| vase                | <span class="number">32.91</span> | <span class="number">42.82</span> |</span><br><span class="line">| traffic light       | <span class="number">28.49</span> | <span class="number">40.94</span> |</span><br><span class="line">| tray                | <span class="number">9.37</span>  | <span class="number">12.05</span> |</span><br><span class="line">| ashcan              | <span class="number">39.81</span> | <span class="number">52.34</span> |</span><br><span class="line">| fan                 | <span class="number">60.07</span> | <span class="number">72.86</span> |</span><br><span class="line">| pier                | <span class="number">54.33</span> | <span class="number">84.51</span> |</span><br><span class="line">| crt screen          | <span class="number">5.25</span>  | <span class="number">16.89</span> |</span><br><span class="line">| plate               | <span class="number">45.0</span>  | <span class="number">57.68</span> |</span><br><span class="line">| monitor             | <span class="number">14.04</span> | <span class="number">19.48</span> |</span><br><span class="line">| bulletin board      | <span class="number">47.86</span> | <span class="number">55.79</span> |</span><br><span class="line">| shower              | <span class="number">0.45</span>  | <span class="number">0.7</span>   |</span><br><span class="line">| radiator            | <span class="number">51.47</span> | <span class="number">61.22</span> |</span><br><span class="line">| glass               | <span class="number">13.14</span> | <span class="number">14.29</span> |</span><br><span class="line">| clock               | <span class="number">31.41</span> | <span class="number">39.73</span> |</span><br><span class="line">| flag                | <span class="number">46.52</span> | <span class="number">50.16</span> |</span><br><span class="line">+---------------------+-------+-------+</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Deep Learning</category>
+      </categories>
+      <tags>
+        <tag>Transformer</tag>
+        <tag>Semantic Segmentation</tag>
+        <tag>Configure Environment</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>跑通Swin Transformer V2语义分割任务</title>
+    <url>/2023/08/15/%E8%B7%91%E9%80%9ASwin-Transformer-V2%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/</url>
+    <content><![CDATA[<p><a href="https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation"><strong>github仓库地址</strong></a></p>
+<p><a href="https://github.com/ChristophReich1996/Swin-Transformer-V2">Swin Transformer V2的实现</a></p>
+<p><a href="https://lyhkk12138.cn/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">Swin Transformer V1博文地址</a></p>
+<p><strong>Configure environment</strong></p>
+<p>使用V1的环境，将Swin V2的backbone的实现放入对应conda虚拟环境的<code>python/site-packages/mmseg/model/backbone</code>之中，并且要在<code>Class SwinTransformerV2</code>前面添加两行代码，这是关于<code>mmseg</code>的<code>Registry</code>类，只有将V2注册到<code>BACKBONES</code>之中，才能使用<code>Swin V2</code></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> ..builder <span class="keyword">import</span> BACKBONES</span><br><span class="line"><span class="meta">@BACKBONES.register_module()</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>制作自己的config文件</strong></p>
+<p>类比于<code>Swin V1+upernet</code>的<code>config文件</code>，但目前没有调好，主要要改变的是关于模型的部分，但目前还没有调好，其中，比较重要的是<code>window size</code>和<code>input resolution</code>两个超参，目前我使用的是<code>window size=7，input resolution=[224,224]</code>，能跑但效果不佳</p>
 ]]></content>
       <categories>
         <category>Deep Learning</category>
@@ -864,28 +964,6 @@
         <tag>Semantic Segmentation</tag>
         <tag>Configure Environment</tag>
         <tag>Coding</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>跑通Swin Transformer V2语义分割任务</title>
-    <url>/2023/08/15/%E8%B7%91%E9%80%9ASwin-Transformer-V2%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2%E4%BB%BB%E5%8A%A1/</url>
-    <content><![CDATA[<p><a href="https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation"><strong>github仓库地址</strong></a></p>
-<p><a href="https://github.com/ChristophReich1996/Swin-Transformer-V2">Swin Transformer V2的实现</a></p>
-<p><a href="https://lyhkk12138.cn/2023/08/16/Swin-Transformer-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/">Swin Transformer V1博文地址</a></p>
-<p><strong>Configure environment</strong></p>
-<p>使用V1的环境，将Swin V2的backbone的实现放入对应conda虚拟环境的<code>python/site-packages/mmseg/model/backbone</code>之中，并且要在<code>Class SwinTransformerV2</code>前面添加两行代码，这是关于<code>mmseg</code>的<code>Registry</code>类，只有将V2注册到<code>BACKBONES</code>之中，才能使用<code>Swin V2</code></p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> ..builder <span class="keyword">import</span> BACKBONES</span><br><span class="line"><span class="meta">@BACKBONES.register_module()</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>制作自己的config文件</strong></p>
-<p>类比于<code>Swin V1+upernet</code>的<code>config文件</code>，但目前没有调好，主要要改变的是关于模型的部分，但目前还没有调好，其中，比较重要的是<code>window size</code>和<code>input resolution</code>两个超参，目前我使用的是<code>window size=7，input resolution=[224,224]</code>，能跑但效果不佳</p>
-]]></content>
-      <categories>
-        <category>Deep Learning</category>
-      </categories>
-      <tags>
-        <tag>Transformer</tag>
-        <tag>Semantic Segmentation</tag>
-        <tag>Configure Environment</tag>
       </tags>
   </entry>
 </search>
