@@ -27,11 +27,14 @@
 <meta property="og:site_name" content="Code×Life">
 <meta property="og:description" content="增强基本技能">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309241115652.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309241115653.png">
 <meta property="article:published_time" content="2023-09-22T08:41:35.000Z">
-<meta property="article:modified_time" content="2023-09-23T09:19:36.933Z">
+<meta property="article:modified_time" content="2023-09-24T03:15:45.129Z">
 <meta property="article:author" content="lyhkk">
 <meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309241115652.png">
 
 <link rel="canonical" href="http://example.com/2023/09/22/%E6%AF%8F%E5%A4%A9%E4%B8%80%E6%9D%A1Linux%E5%91%BD%E4%BB%A4/">
 
@@ -219,7 +222,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-23 17:19:36" itemprop="dateModified" datetime="2023-09-23T17:19:36+08:00">2023-09-23</time>
+                <time title="修改时间：2023-09-24 11:15:45" itemprop="dateModified" datetime="2023-09-24T11:15:45+08:00">2023-09-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -314,6 +317,52 @@
 <p>FTP有<code>主动模式</code>与<code>被动模式</code></p>
 <p><code>主动模式</code>: FTP 客户端（通常是本地计算机）发起与 FTP 服务器的连接。客户端随机选择一个未使用的本地端口（N&gt;1023），并通过这个端口与服务器的控制端口（通常是端口 21）建立连接。然后，客户端通过控制连接发送 PORT 命令，其中包含了客户端数据连接的 IP 地址和端口号。服务器从该指定的数据端口向客户端的数据端口发起连接，进行数据传输。(<strong>curl使用FTP传输默认为主动模式, <code>curl -P 端口</code>可以指定端口</strong>)</p>
 <p><code>被动模式</code>: 在被动模式下，FTP 客户端发起与 FTP 服务器的连接。客户端通过控制连接发送 PASV 命令，服务器在一个指定的非特权端口（通常是端口号大于 1023）上监听连接。然后，服务器将其 IP 地址和监听的数据端口号作为响应发送给客户端。客户端随后通过数据连接的新端口与服务器的数据端口建立连接，并进行数据传输。(<strong><code>curl --ftp-pasv</code>且不使用<code>-P</code>和<code>--ftp-port</code>可以切换到被动模式</strong>)</p>
+</blockquote>
+</li>
+</ol>
+<h4 id="9-x2F-23-iptables"><a href="#9-x2F-23-iptables" class="headerlink" title="9&#x2F;23 - iptables"></a>9&#x2F;23 - iptables</h4><ol>
+<li><p>流量进入过程：-&gt;网卡-&gt;Linux内核(<strong>过滤流量 - <code>netfilter</code>负责</strong>)-&gt;网络谣言(用户空间)</p>
+</li>
+<li><p><code>iptables</code>: 普通用户通过<code>iptables</code>(前端)操作<code>netfileter</code>(后端)，可以类比为<mark>用户自定义的防火墙配置</mark></p>
+</li>
+<li><p>tables: <strong><code>filter</code></strong>, <strong><code>nat</code></strong>, <code>mangle</code>, <code>raw</code>, <code>security</code> (前两个最重要)</p>
+<blockquote>
+<p><strong><code>filter</code></strong>: 过滤</p>
+<p><code>nat</code>: 网络地址转换，还可以负载均衡</p>
+</blockquote>
+</li>
+<li><p><strong><code>filter</code></strong></p>
+<blockquote>
+<p>在内核和硬件&#x2F;用户空间的交互中，有五条链路：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309241115652.png" alt="image-20230924095417533"></p>
+<p>当使用<code>filter</code>表时，需要管理<code>INPUT</code>, <code>OUTPUT</code>, <code>FORWARD</code>链</p>
+<p><code>sudo iptables --table filter --list (--line-numbers)</code>: 查看<code>filter</code>表的链路以及链路上的规则</p>
+<p><code>sudo iptables --append(-A) 链名 --source(-s) 源ip(/子网掩码) -p 协议 -d 目标ip(/子网掩码) --jump(-j) REJECT/ACCEPT/DROP</code>: 制定规则，此时无需指定–tables，因为<code>filter</code>是管理链路的接口，而我们是直接指定链路上的规则(常用的扩展选项：–dport 指定端口)</p>
+<p><code>sudo iptables --table filter --delete INPUT 1</code>: 通过<code>filter</code>表，删除<code>INPUT</code>链路中的第一条规则（在表中对应为行号为1的规则）</p>
+<p><code>sudo iptables -F INPUT</code>: 清空 <code>input</code> 链中的所有规则。</p>
+</blockquote>
+</li>
+<li><p>用<code>ipset</code>优雅的批处理ip地址</p>
+<blockquote>
+<p><code>ipset create 集合名 hash:net</code>: 创建空集合</p>
+<p><code>ipset list 集合名</code>: 检查已有的ipset(Members字段显示集合中的ip地址)</p>
+<p>写脚本将有大量ip地址的文件传给<code>ipset</code>，并给<code>iptables</code>设置规则(下面的例子是在WSL上编写的shell脚本)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309241115653.png" alt="image-20230924110639488"></p>
+<p><code>ipset</code>和<code>iptables</code>在主机&#x2F;服务器关机重启后，会被清空，所以</p>
+<p>设置好规则之后，需要</p>
+<p><code>ipset save &gt; /path/to/save/rules.ipset</code></p>
+<p><code>iptables-save &gt; /path/to/save/rules.iptables</code></p>
+<p>重启后，需要(这是不覆盖已有规则的方法)</p>
+<p><code>ipset restore &lt; /path/to/save/rules.ipset -exist</code></p>
+<p><code>iptables restore &lt; /path/to/save/rules.iptables --no-flush(-n) </code></p>
+<p>以下是一些<strong>常见的IP集合哈希表类型</strong>：</p>
+<ol>
+<li><code>hash:ip</code>：用于存储单个IP地址。</li>
+<li><code>hash:ip,port</code>：用于存储IP地址和端口号的组合。</li>
+<li><code>hash:net,net</code>：用于存储IP网络之间的组合。</li>
+<li><code>hash:net,port</code>：用于存储IP网络和端口号的组合。</li>
+<li><code>hash:ip,port,ip</code>：用于存储两个IP地址和一个端口号的组合，通常用于NAT转换等应用。</li>
+</ol>
 </blockquote>
 </li>
 </ol>
@@ -414,7 +463,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#9-x2F-22-curl"><span class="nav-number">1.</span> <span class="nav-text">9&#x2F;22 - curl</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#9-x2F-22-curl"><span class="nav-number">1.</span> <span class="nav-text">9&#x2F;22 - curl</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-x2F-23-iptables"><span class="nav-number">2.</span> <span class="nav-text">9&#x2F;23 - iptables</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
