@@ -1,6 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Attention Is All You Need论文笔记</title>
+    <url>/2023/08/14/Attention%20Is%20All%20You%20Need%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<p><a href="https://arxiv.org/abs/1706.03762">论文地址</a></p>
+<h2 id="Transformer"><a href="#Transformer" class="headerlink" title="Transformer"></a>Transformer</h2><ol>
+<li><p>Attention有无限长上下文窗口，之前序列生成算法(LSTM, GPT2)的难点</p>
+</li>
+<li><p>Query: 类比Google输入框</p>
+<p>Key: Google根据Query为你匹配到的关键词</p>
+<p>Value: 查询到的网页</p>
+</li>
+<li><p>Encoder-Decoder结构:</p>
+<p>Encoder: 将文本序列变为带有注意力的向量表示</p>
+<p>Decoder: 生成序列</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046791.png" alt="image-20230813110607595"></p>
+</li>
+<li><p>模块化解读</p>
+<ol>
+<li><p>Input Embedding: 输入的symbol representation映射到continuous presentation(向量)</p>
+</li>
+<li><p>Positional Encoding: 将token的位置信息映射到向量（位置信息对语义的表达很关键）</p>
+<p>数学实现：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046792.png" alt="image-20230813210127612"></p>
+<p>1）d&lt;&#x3D;&gt;d<del>model</del>，和Input Embedding层输出的向量维度相同</p>
+<p>​      i的计算方法由下面的示例说明</p>
+<p>2）编码原则：唯一性，不同长度序列的token间间隔含义相同</p>
+<p>3）为什么不用index of token作为位置编码：For long sequences, the indices can grow large in magnitude. &#x3D;&#x3D;If you normalize the index value to lie between 0 and 1, it can create problems for variable length sequences as they would be normalized differently.&#x3D;&#x3D;这违背了一个位置编码的原则：对于不同长度的序列，token的间隔的含义要相同 –&gt; 最好编码完，得到的位置信息自然∈(0,1)</p>
+<p>4）Example:<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046793.png" alt="image-20230813210507196"></p>
+<blockquote>
+<p>i的计算方法：0≤i&lt;d&#x2F;2&#x3D;2，4维的positional encoding的index&#x3D;0,1,2,3，index为奇数，2i+1&#x3D;index，index为偶数，2i&#x3D;index。上图的index对应得出i的取值0,0,1,1</p>
+<p>根据示例分析是否符合编码原则：</p>
+<ol>
+<li>位置编码向量是否唯一：看上图矩阵第一列，编码始终为sin(2i+1)或cos(2i) (i∈N)，根据对称性，因为sin和cos对称轴始终不在自然数上，所以不可能有相同的，满足唯一性</li>
+<li>不同长度的序列，token之间的间隔的含义要相同，因为这种方式产生的编码自然在(0,1)区间，不需要normalization。这里的不同长度序列，它们的(n, i, d)这个三元组取值都相同，只是k的范围不同，那么token的间隔始终相同</li>
+</ol>
+</blockquote>
+</li>
+<li><p><strong>Multi-Head Attention:</strong></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046794.png" alt="image-20230813110533123"></p>
+<blockquote>
+<p>h for “Head” num</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046795.png" alt="image-20230813111743464"></p>
+<p>Q, K, V都是d<del>model</del>列</p>
+<p>W<del>i</del>是weight矩阵，d<del>model</del> &#x3D; n<del>head</del> * d<del>k</del></p>
+</blockquote>
+<ol>
+<li><p>代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MultiHeadAttention</span>(nn.Module):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27; Multi-Head Attention module &#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n_head, d_model, d_k, d_v, dropout=<span class="number">0.1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line"></span><br><span class="line">        self.n_head = n_head</span><br><span class="line">        self.d_k = d_k</span><br><span class="line">        self.d_v = d_v</span><br><span class="line"></span><br><span class="line">        self.w_qs = nn.Linear(d_model, n_head * d_k, bias=<span class="literal">False</span>)</span><br><span class="line">        self.w_ks = nn.Linear(d_model, n_head * d_k, bias=<span class="literal">False</span>)</span><br><span class="line">        self.w_vs = nn.Linear(d_model, n_head * d_v, bias=<span class="literal">False</span>)</span><br><span class="line">        self.fc = nn.Linear(n_head * d_v, d_model, bias=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">        self.attention = ScaledDotProductAttention(temperature=d_k ** <span class="number">0.5</span>)</span><br><span class="line"></span><br><span class="line">        self.dropout = nn.Dropout(dropout)</span><br><span class="line">        self.layer_norm = nn.LayerNorm(d_model, eps=<span class="number">1e-6</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, q, k, v, mask=<span class="literal">None</span></span>):</span><br><span class="line"></span><br><span class="line">        d_k, d_v, n_head = self.d_k, self.d_v, self.n_head</span><br><span class="line">        sz_b, len_q, len_k, len_v = q.size(<span class="number">0</span>), q.size(<span class="number">1</span>), k.size(<span class="number">1</span>), v.size(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        residual = q</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Pass through the pre-attention projection: b x lq x (n*dv)</span></span><br><span class="line">        <span class="comment"># Separate different heads: b x lq x n x dv</span></span><br><span class="line">        q = self.w_qs(q).view(sz_b, len_q, n_head, d_k)</span><br><span class="line">        k = self.w_ks(k).view(sz_b, len_k, n_head, d_k)</span><br><span class="line">        v = self.w_vs(v).view(sz_b, len_v, n_head, d_v)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Transpose for attention dot product: b x n x lq x dv</span></span><br><span class="line">        q, k, v = q.transpose(<span class="number">1</span>, <span class="number">2</span>), k.transpose(<span class="number">1</span>, <span class="number">2</span>), v.transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            mask = mask.unsqueeze(<span class="number">1</span>)   <span class="comment"># For head axis broadcasting.</span></span><br><span class="line"></span><br><span class="line">        q, attn = self.attention(q, k, v, mask=mask)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Transpose to move the head dimension back: b x lq x n x dv</span></span><br><span class="line">        <span class="comment"># Combine the last two dimensions to concatenate all the heads together: b x lq x (n*dv)</span></span><br><span class="line">        q = q.transpose(<span class="number">1</span>, <span class="number">2</span>).contiguous().view(sz_b, len_q, -<span class="number">1</span>)</span><br><span class="line">        q = self.dropout(self.fc(q))</span><br><span class="line">        q += residual</span><br><span class="line"></span><br><span class="line">        q = self.layer_norm(q)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> q, attn <span class="comment"># 返回输出和attention</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>len_q, len_k, len_v对应论文中的d<del>model</del>，并且相等</p>
+</blockquote>
+</li>
+<li><p><strong>Scaled Dot-Product Attention:</strong></p>
+<ol>
+<li><p>比较Query和Key相似度-&gt;softmax-&gt;对Value加权</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046796.png" alt="image-20230813004534001"></p>
+<blockquote>
+<p>为什么要Scale: 论文原文：We suspect that for large values of d<del>k</del>, the dot products grow large in magnitude, pushing the softmax function into regions where it has <strong>extremely small gradients</strong></p>
+<ol>
+<li>由于softmax函数计算方法使用了指数函数，如果d<del>k</del>大了，参与QK^T^点乘的元素个数增加，产生的矩阵，各个位置的值大概率变大，反向传播时，梯度极小</li>
+<li>指数函数可能存在数值的上溢和下溢问题</li>
+</ol>
+<p>Mask矩阵: Mask是一个bool型矩阵。在第 i 时刻做注意力计算时，&gt;i 的时刻都没有结果，只有＜i 的时刻有结果。注意力只与之前的内容相关，因此需要做Mask，将QK^T^点乘产生的矩阵中，在Mask规定的需要掩住的位置上，将结果矩阵值设为-1e9，经过softmax后就是0</p>
+</blockquote>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308131104219.png" alt="image-20230813004024882"></p>
+</li>
+<li><p>代码实现：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ScaledDotProductAttention</span>(nn.Module):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27; Scaled Dot-Product Attention &#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, temperature, attn_dropout=<span class="number">0.1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.temperature = temperature  <span class="comment"># 1/sqrt(d_k)</span></span><br><span class="line">        self.dropout = nn.Dropout(attn_dropout)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, q, k, v, mask=<span class="literal">None</span></span>):</span><br><span class="line"></span><br><span class="line">        attn = torch.matmul(q / self.temperature, k.transpose(<span class="number">2</span>, <span class="number">3</span>))</span><br><span class="line">        <span class="comment"># mask --&gt; 只能通过现有的output序列生成新的序列</span></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>: </span><br><span class="line">            attn = attn.masked_fill(mask == <span class="number">0</span>, -<span class="number">1e9</span>)</span><br><span class="line"></span><br><span class="line">        attn = self.dropout(F.softmax(attn, dim=-<span class="number">1</span>)) <span class="comment"># dropout应该也是option ?</span></span><br><span class="line">        output = torch.matmul(attn, v)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> output, attn</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>Decoder:</p>
+<ol>
+<li><p>搞清三个输入箭头：</p>
+<ol>
+<li>Outputs(shifted right): 将生成的序列作为输入</li>
+<li>将Encoder输出的Attention向量作为第二个Multi-Head Attention的Attention</li>
+</ol>
+</li>
+<li><p>为什么要用Masked Multi-Head Attention</p>
+<ol>
+<li><p>因为这是对生成序列进行Attention，而每一时刻生成的序列，只能与之前生成的序列关联</p>
+</li>
+<li><p>如何进行mask:</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046797.png" alt="image-20230814005832316"></p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Deep Learning</category>
+      </categories>
+      <tags>
+        <tag>Transformer</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>BEiT V1论文笔记</title>
     <url>/2023/08/31/BEiT-V1%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<p><a href="https://arxiv.org/abs/2106.08254">paper reference</a></p>
@@ -107,109 +210,6 @@
 <p>VAE: directly using pixel-level auto-encoding(<strong>continuous vector space to represent latent space</strong>) -&gt; foucus on short-range dependencies and high-frequency details</p>
 <p>dVAE: discrete visual tokens</p>
 </blockquote>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>Deep Learning</category>
-      </categories>
-      <tags>
-        <tag>Transformer</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Attention Is All You Need论文笔记</title>
-    <url>/2023/08/14/Attention%20Is%20All%20You%20Need%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p><a href="https://arxiv.org/abs/1706.03762">论文地址</a></p>
-<h2 id="Transformer"><a href="#Transformer" class="headerlink" title="Transformer"></a>Transformer</h2><ol>
-<li><p>Attention有无限长上下文窗口，之前序列生成算法(LSTM, GPT2)的难点</p>
-</li>
-<li><p>Query: 类比Google输入框</p>
-<p>Key: Google根据Query为你匹配到的关键词</p>
-<p>Value: 查询到的网页</p>
-</li>
-<li><p>Encoder-Decoder结构:</p>
-<p>Encoder: 将文本序列变为带有注意力的向量表示</p>
-<p>Decoder: 生成序列</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046791.png" alt="image-20230813110607595"></p>
-</li>
-<li><p>模块化解读</p>
-<ol>
-<li><p>Input Embedding: 输入的symbol representation映射到continuous presentation(向量)</p>
-</li>
-<li><p>Positional Encoding: 将token的位置信息映射到向量（位置信息对语义的表达很关键）</p>
-<p>数学实现：</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046792.png" alt="image-20230813210127612"></p>
-<p>1）d&lt;&#x3D;&gt;d<del>model</del>，和Input Embedding层输出的向量维度相同</p>
-<p>​      i的计算方法由下面的示例说明</p>
-<p>2）编码原则：唯一性，不同长度序列的token间间隔含义相同</p>
-<p>3）为什么不用index of token作为位置编码：For long sequences, the indices can grow large in magnitude. &#x3D;&#x3D;If you normalize the index value to lie between 0 and 1, it can create problems for variable length sequences as they would be normalized differently.&#x3D;&#x3D;这违背了一个位置编码的原则：对于不同长度的序列，token的间隔的含义要相同 –&gt; 最好编码完，得到的位置信息自然∈(0,1)</p>
-<p>4）Example:<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046793.png" alt="image-20230813210507196"></p>
-<blockquote>
-<p>i的计算方法：0≤i&lt;d&#x2F;2&#x3D;2，4维的positional encoding的index&#x3D;0,1,2,3，index为奇数，2i+1&#x3D;index，index为偶数，2i&#x3D;index。上图的index对应得出i的取值0,0,1,1</p>
-<p>根据示例分析是否符合编码原则：</p>
-<ol>
-<li>位置编码向量是否唯一：看上图矩阵第一列，编码始终为sin(2i+1)或cos(2i) (i∈N)，根据对称性，因为sin和cos对称轴始终不在自然数上，所以不可能有相同的，满足唯一性</li>
-<li>不同长度的序列，token之间的间隔的含义要相同，因为这种方式产生的编码自然在(0,1)区间，不需要normalization。这里的不同长度序列，它们的(n, i, d)这个三元组取值都相同，只是k的范围不同，那么token的间隔始终相同</li>
-</ol>
-</blockquote>
-</li>
-<li><p><strong>Multi-Head Attention:</strong></p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046794.png" alt="image-20230813110533123"></p>
-<blockquote>
-<p>h for “Head” num</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046795.png" alt="image-20230813111743464"></p>
-<p>Q, K, V都是d<del>model</del>列</p>
-<p>W<del>i</del>是weight矩阵，d<del>model</del> &#x3D; n<del>head</del> * d<del>k</del></p>
-</blockquote>
-<ol>
-<li><p>代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MultiHeadAttention</span>(nn.Module):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27; Multi-Head Attention module &#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n_head, d_model, d_k, d_v, dropout=<span class="number">0.1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line"></span><br><span class="line">        self.n_head = n_head</span><br><span class="line">        self.d_k = d_k</span><br><span class="line">        self.d_v = d_v</span><br><span class="line"></span><br><span class="line">        self.w_qs = nn.Linear(d_model, n_head * d_k, bias=<span class="literal">False</span>)</span><br><span class="line">        self.w_ks = nn.Linear(d_model, n_head * d_k, bias=<span class="literal">False</span>)</span><br><span class="line">        self.w_vs = nn.Linear(d_model, n_head * d_v, bias=<span class="literal">False</span>)</span><br><span class="line">        self.fc = nn.Linear(n_head * d_v, d_model, bias=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">        self.attention = ScaledDotProductAttention(temperature=d_k ** <span class="number">0.5</span>)</span><br><span class="line"></span><br><span class="line">        self.dropout = nn.Dropout(dropout)</span><br><span class="line">        self.layer_norm = nn.LayerNorm(d_model, eps=<span class="number">1e-6</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, q, k, v, mask=<span class="literal">None</span></span>):</span><br><span class="line"></span><br><span class="line">        d_k, d_v, n_head = self.d_k, self.d_v, self.n_head</span><br><span class="line">        sz_b, len_q, len_k, len_v = q.size(<span class="number">0</span>), q.size(<span class="number">1</span>), k.size(<span class="number">1</span>), v.size(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        residual = q</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Pass through the pre-attention projection: b x lq x (n*dv)</span></span><br><span class="line">        <span class="comment"># Separate different heads: b x lq x n x dv</span></span><br><span class="line">        q = self.w_qs(q).view(sz_b, len_q, n_head, d_k)</span><br><span class="line">        k = self.w_ks(k).view(sz_b, len_k, n_head, d_k)</span><br><span class="line">        v = self.w_vs(v).view(sz_b, len_v, n_head, d_v)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Transpose for attention dot product: b x n x lq x dv</span></span><br><span class="line">        q, k, v = q.transpose(<span class="number">1</span>, <span class="number">2</span>), k.transpose(<span class="number">1</span>, <span class="number">2</span>), v.transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            mask = mask.unsqueeze(<span class="number">1</span>)   <span class="comment"># For head axis broadcasting.</span></span><br><span class="line"></span><br><span class="line">        q, attn = self.attention(q, k, v, mask=mask)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Transpose to move the head dimension back: b x lq x n x dv</span></span><br><span class="line">        <span class="comment"># Combine the last two dimensions to concatenate all the heads together: b x lq x (n*dv)</span></span><br><span class="line">        q = q.transpose(<span class="number">1</span>, <span class="number">2</span>).contiguous().view(sz_b, len_q, -<span class="number">1</span>)</span><br><span class="line">        q = self.dropout(self.fc(q))</span><br><span class="line">        q += residual</span><br><span class="line"></span><br><span class="line">        q = self.layer_norm(q)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> q, attn <span class="comment"># 返回输出和attention</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>len_q, len_k, len_v对应论文中的d<del>model</del>，并且相等</p>
-</blockquote>
-</li>
-<li><p><strong>Scaled Dot-Product Attention:</strong></p>
-<ol>
-<li><p>比较Query和Key相似度-&gt;softmax-&gt;对Value加权</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046796.png" alt="image-20230813004534001"></p>
-<blockquote>
-<p>为什么要Scale: 论文原文：We suspect that for large values of d<del>k</del>, the dot products grow large in magnitude, pushing the softmax function into regions where it has <strong>extremely small gradients</strong></p>
-<ol>
-<li>由于softmax函数计算方法使用了指数函数，如果d<del>k</del>大了，参与QK^T^点乘的元素个数增加，产生的矩阵，各个位置的值大概率变大，反向传播时，梯度极小</li>
-<li>指数函数可能存在数值的上溢和下溢问题</li>
-</ol>
-<p>Mask矩阵: Mask是一个bool型矩阵。在第 i 时刻做注意力计算时，&gt;i 的时刻都没有结果，只有＜i 的时刻有结果。注意力只与之前的内容相关，因此需要做Mask，将QK^T^点乘产生的矩阵中，在Mask规定的需要掩住的位置上，将结果矩阵值设为-1e9，经过softmax后就是0</p>
-</blockquote>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308131104219.png" alt="image-20230813004024882"></p>
-</li>
-<li><p>代码实现：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ScaledDotProductAttention</span>(nn.Module):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27; Scaled Dot-Product Attention &#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, temperature, attn_dropout=<span class="number">0.1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.temperature = temperature  <span class="comment"># 1/sqrt(d_k)</span></span><br><span class="line">        self.dropout = nn.Dropout(attn_dropout)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, q, k, v, mask=<span class="literal">None</span></span>):</span><br><span class="line"></span><br><span class="line">        attn = torch.matmul(q / self.temperature, k.transpose(<span class="number">2</span>, <span class="number">3</span>))</span><br><span class="line">        <span class="comment"># mask --&gt; 只能通过现有的output序列生成新的序列</span></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>: </span><br><span class="line">            attn = attn.masked_fill(mask == <span class="number">0</span>, -<span class="number">1e9</span>)</span><br><span class="line"></span><br><span class="line">        attn = self.dropout(F.softmax(attn, dim=-<span class="number">1</span>)) <span class="comment"># dropout应该也是option ?</span></span><br><span class="line">        output = torch.matmul(attn, v)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> output, attn</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>Decoder:</p>
-<ol>
-<li><p>搞清三个输入箭头：</p>
-<ol>
-<li>Outputs(shifted right): 将生成的序列作为输入</li>
-<li>将Encoder输出的Attention向量作为第二个Multi-Head Attention的Attention</li>
-</ol>
-</li>
-<li><p>为什么要用Masked Multi-Head Attention</p>
-<ol>
-<li><p>因为这是对生成序列进行Attention，而每一时刻生成的序列，只能与之前生成的序列关联</p>
-</li>
-<li><p>如何进行mask:</p>
-<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202308141046797.png" alt="image-20230814005832316"></p>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
 </li>
 </ol>
 ]]></content>
@@ -801,7 +801,7 @@
 </ol>
 ]]></content>
       <categories>
-        <category>Basic_Skills</category>
+        <category>Basic Skills</category>
       </categories>
       <tags>
         <tag>Linux</tag>
