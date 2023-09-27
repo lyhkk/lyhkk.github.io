@@ -29,8 +29,11 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309241115652.png">
 <meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309241115653.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309271047004.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309271047005.png">
+<meta property="og:image" content="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309271047006.png">
 <meta property="article:published_time" content="2023-09-22T08:41:35.000Z">
-<meta property="article:modified_time" content="2023-09-24T03:17:06.589Z">
+<meta property="article:modified_time" content="2023-09-27T02:47:17.064Z">
 <meta property="article:author" content="lyhkk">
 <meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary">
@@ -222,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-24 11:17:06" itemprop="dateModified" datetime="2023-09-24T11:17:06+08:00">2023-09-24</time>
+                <time title="修改时间：2023-09-27 10:47:17" itemprop="dateModified" datetime="2023-09-27T10:47:17+08:00">2023-09-27</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -366,6 +369,117 @@
 </blockquote>
 </li>
 </ol>
+<h4 id="9-x2F-24-echo"><a href="#9-x2F-24-echo" class="headerlink" title="9&#x2F;24 echo"></a>9&#x2F;24 echo</h4><ol>
+<li><p><code>echo &lt;text&gt;</code> 输出到终端</p>
+</li>
+<li><p><code>history + echo !&lt;id&gt;</code>: 输出history第id个命令</p>
+</li>
+<li><p>重定向： </p>
+<p><code>&gt; &lt;file&gt;</code> : 从头开始写入file </p>
+<p><code>&gt;&gt; &lt;file&gt;</code>: 在file中续写</p>
+</li>
+</ol>
+<h4 id="9-x2F-25-awk"><a href="#9-x2F-25-awk" class="headerlink" title="9&#x2F;25 awk"></a>9&#x2F;25 awk</h4><ol>
+<li><p><code>awk</code>是一种强大的文本处理工具，可以用于提取、过滤、处理和格式化文本数据。它以行为单位(Record)读取输入文件，并按照指定的规则执行相应的操作</p>
+</li>
+<li><p><code>awk options &#39;pattern &#123; action &#125; &lt;file&gt;&#39;</code>  – 基本格式(<mark><code>pattern</code>字段用于匹配文本</mark>)</p>
+<p><code>awk &#39;NR==3&#123;print $0&#125;&#39; &lt;file&gt;</code>  –用<code>pattern</code>打印第三行(<code>pattern</code>和<code>action</code>中间可以没有空格)</p>
+<blockquote>
+<p>与不用模式的方法对比：<code>awk &#123;if(NR==3) &#123;print $0&#125;&#125;</code>, 用<code>pattern</code>更简便</p>
+<p>只用<code>pattern</code>，不用<code>action</code>: <code>awk &#39;/xm/&#39; &lt;file&gt;</code>，打印所有可以匹配到<code>xm</code>字段的<code>record</code></p>
+<p>用<code>pattern</code>打印第一行到第三行：<code>awk &#39;NR==1, NR==3 &#123;print $0&#125;&#39; &lt;file&gt;</code></p>
+<p>用<code>pattern</code>打印第一行和第三行：<code>awk &#39;NR==1 || NR==3 &#123;print $0&#125;&#39; &lt;file&gt;</code></p>
+</blockquote>
+<p><code>awk &#39;&#123;print $1&#125;&#39; &lt;file&gt;</code>  – 打印每一行的<strong>第一列</strong> (字段分隔符默认为空格) (print默认打印\n，printf不是)</p>
+<blockquote>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309271047004.png" alt="image-20230926173259848"></p>
+<p>从上到下展示：(好像没有居中对齐)</p>
+<ol>
+<li>没有对齐好的情况(%-2s)</li>
+<li>第一列向左对齐(%-3s)</li>
+<li>第一列向右对齐(%3s)  —没有<code>-</code>默认向右对齐</li>
+<li>第二列向右对齐(%3d)</li>
+<li>第二列向左对齐(%-3d)</li>
+</ol>
+</blockquote>
+</li>
+<li><p><mark>常用option</mark>(option的参数最好也用单引号引起来)</p>
+<blockquote>
+<p>-v var&#x3D;value：， 赋值一个用户定义变量，将外部变量传递给awk，或者是设置内置变量</p>
+<p>eg. 也可以外部引入，比方说打印环境变量：<code>awk -v var=$PATH &#39;BEGIN &#123;print var&#125;&#39;</code></p>
+<p>-F: filed seperator，输入字段分隔符(示例如下图，<code>Command 1</code>对应的是一个三行四列，文件中分隔符为<code>,</code>的情况；<code>Command 2</code>对应的是一个三行四列，文件中前2个字段分隔符为<code>,</code>，但第三个分隔符为<code>空格</code>的情况) -&gt; ‘[]’允许不止一个分隔符</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309271047005.png" alt="image-20230926185028341"></p>
+<p>-f [写好的.sh]: 从脚本文件中读取awk语句块，脚本内不需要单引号</p>
+</blockquote>
+</li>
+<li><p><mark>语句块</mark></p>
+<ol>
+<li><p>由<code>BEGIN</code>或<code>END</code>或<code>[pattern]</code>或引领的语句，或者都没有</p>
+</li>
+<li><p>pattern</p>
+<blockquote>
+<ul>
+<li><p>&#x2F;正则表达式&#x2F;：使用通配符的扩展集。</p>
+<p>eg. 打印有数字的Record(如果是<code>print $n</code>, 就打印有数字的Record的第n列) <code>awk &#39;/[0-9]+/ &#123; print $0; &#125;&#39; &lt;file&gt;</code>(<code>+</code>是正则表达式中的 a<sup>+</sup>&#x3D;a·a<sup>*</sup>的+，<code>[]</code>代表将[]内的内容变为字符类)</p>
+</li>
+<li><p>关系表达式：使用运算符进行操作，可以是字符串或数字的比较测试。</p>
+<p>eg. 比较第一个字段是否大于 10。例如，可以使用 <code>awk &#39;$1 &gt; 10 &#123; print $0; &#125;&#39; &lt;file&gt;</code> 来打印第一个字段大于 10 的行。</p>
+</li>
+<li><p>模式匹配表达式：用运算符~（匹配）和 ~!（不匹配）。</p>
+<p>eg: <code>awk &#39;$1 ~ /xm/ &#123; print $0; &#125;&#39; testfile.txt</code></p>
+</li>
+</ul>
+<p><mark>Attention</mark>: 表达式匹配有三种：以表达式<code>开头</code>(&#x2F;^expression&#x2F;)，<code>结尾</code>(&#x2F;expression$&#x2F;)，或表达式<code>存在</code>于字段中(&#x2F;expression&#x2F;)</p>
+</blockquote>
+</li>
+<li><p>BEGIN，END</p>
+</li>
+</ol>
+<blockquote>
+<p>对于命令<code>awk &#39;BEGIN&#123; commands &#125; pattern&#123; commands &#125; END&#123; commands &#125;&#39;</code>: </p>
+<ul>
+<li>首先执行 <code>BEGIN &#123;commands&#125;</code> 内的语句块，注意这<strong>只会执行一次</strong>，经常用于变量初始化，头行打印一些表头信息，只会执行一次，在通过stdin读入数据前就被执行；</li>
+<li>从文件内容中读取一行，注意<strong>awk是以行为单位处理的，每读取一行使用</strong> <strong><code>pattern&#123;commands&#125;</code></strong> <strong>循环处理</strong> 可以理解成一个for循环，这也是最重要的部分；</li>
+<li>最后执行 <code>END&#123; commands &#125;</code> ,也是<strong>执行一次</strong>，在所有行处理完后执行，一帮用于打印一些统计结果。</li>
+</ul>
+</blockquote>
+</li>
+<li><p><mark>内置变量</mark></p>
+<blockquote>
+<ol>
+<li><p><code>FS</code>：字段分隔符（Field Separator），默认值是空格或制表符</p>
+</li>
+<li><p><code>OFS</code>：输出字段分隔符（Output Field Separator），默认值是空格</p>
+</li>
+<li><p><code>RS</code>：记录分隔符（Record Separator），默认值是换行符</p>
+</li>
+<li><p><code>ORS</code>：输出记录分隔符（Output Record Separator），默认值是换行符</p>
+</li>
+<li><p><code>NF</code>：当前记录中的字段数（Number of Fields），可以使用 <code>$NF</code> 获取最后一个字段</p>
+</li>
+<li><p><code>NR</code>：已读的记录数（Number of Records）</p>
+</li>
+<li><p><code>$0</code>：整个记录的文本内容</p>
+</li>
+<li><p><code>$[n]</code>：第n个字段(列), <mark>$这个符号自带循环属性，循环结是<code>pattern&#123;commands&#125;</code>语句块(文件的一个record)，全部执行一遍后，进入下一条<code>record</code></mark>(像下面的例子，先打印第1个<code>record</code>的<code>$1</code> <code>$2</code> <code>$3</code>)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202309271047006.png" alt="image-20230926182429950"></p>
+</li>
+<li><p><code>FILENAME</code>：当前处理的文件名</p>
+</li>
+<li><p><code>FNR</code>：当前文件中已读的记录数</p>
+</li>
+<li><p><code>ARGC</code>：命令行参数的个数</p>
+</li>
+<li><p><code>ARGV</code>：命令行参数数组</p>
+</li>
+<li><p><code>CONVFMT</code>：数字转换格式（Conversion Format）</p>
+</li>
+</ol>
+</blockquote>
+</li>
+<li><p><mark>内置函数</mark></p>
+</li>
+</ol>
 
     </div>
 
@@ -463,7 +577,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#9-x2F-22-curl"><span class="nav-number">1.</span> <span class="nav-text">9&#x2F;22 - curl</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-x2F-23-iptables"><span class="nav-number">2.</span> <span class="nav-text">9&#x2F;23 - iptables</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#9-x2F-22-curl"><span class="nav-number">1.</span> <span class="nav-text">9&#x2F;22 - curl</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-x2F-23-iptables"><span class="nav-number">2.</span> <span class="nav-text">9&#x2F;23 - iptables</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-x2F-24-echo"><span class="nav-number">3.</span> <span class="nav-text">9&#x2F;24 echo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-x2F-25-awk"><span class="nav-number">4.</span> <span class="nav-text">9&#x2F;25 awk</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
