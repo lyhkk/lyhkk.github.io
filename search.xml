@@ -910,7 +910,36 @@
 <li><p><mark>内置函数</mark></p>
 </li>
 </ol>
-]]></content>
+<h4 id="9-x2F-26-ls"><a href="#9-x2F-26-ls" class="headerlink" title="9&#x2F;26 ls"></a>9&#x2F;26 ls</h4><ul>
+<li><p><code>-l</code>：以长格式（long format）显示文件和目录的详细信息，包括权限、所有者、大小、修改时间等 (<code>ll</code>是<code>ls -l</code>的缩写)</p>
+</li>
+<li><p><code>-a</code>：显示包括<strong>隐藏文件</strong>在内的所有文件和目录，包括以点开头的文件（通常被视为隐藏文件）</p>
+</li>
+<li><p><code>-h</code>：与 <code>-l</code> 配合使用时，以人类可读的格式显示文件和目录的大小，如使用 KB、MB、GB 等单位</p>
+</li>
+<li><p><code>-r</code>：反向排序，以相反的顺序显示文件和目录</p>
+<p><code>-t</code>：按修改时间排序，最近修改的文件和目录排在前面</p>
+</li>
+<li><p><code>-S</code>：按文件大小排序，从大到小显示文件和目录</p>
+</li>
+<li><p><code>-R</code>：递归地列出目录及其子目录下的所有文件和目录</p>
+</li>
+<li><p><code>--color</code>：以不同颜色显示不同类型的文件和目录，增强可读性</p>
+</li>
+</ul>
+<h4 id="9-x2F-27-find"><a href="#9-x2F-27-find" class="headerlink" title="9&#x2F;27 find"></a>9&#x2F;27 find</h4><p>查找文件</p>
+<ul>
+<li><code>find &lt;目录&gt; -name &quot;文件名/正则表达式(*.txt)&quot;</code> : 这是严格区分大小写的查询，<code>-iname</code>不区分</li>
+<li><code>find &lt;目录&gt; -type f</code> : 按照文件类型查找: <code>f - 文本文件</code>, <code>d - 目录</code>, <code>l - 符号链接</code></li>
+<li><code>-user</code>, <code>-group</code> : 支持按照用户或用户组的查找</li>
+</ul>
+<h4 id="9-x2F-28-cat"><a href="#9-x2F-28-cat" class="headerlink" title="9&#x2F;28 cat"></a>9&#x2F;28 cat</h4><p>查看文件内容</p>
+<p><code>cat -n 文件名</code> : 输出带行号 </p>
+<p><code>-b</code> : 忽略空行，输出带行号</p>
+<p><code>-s</code> : 将文本间多个空行合并为一个</p>
+<p><code>-E</code> : 在每个换行的位置显示一个<code>$</code>占位符，这样防止一行过长，<code>cat</code>时的换行并不是文本的换行，空行会在一开始有<code>$</code></p>
+<p><code>-T</code> : 将<code>Tab</code>以<code>^I</code>的格式显示出来，可以分辨是<code>Tab</code>还是空格</p>
+<h4 id="9-x2F-29"><a href="#9-x2F-29" class="headerlink" title="9&#x2F;29"></a>9&#x2F;29</h4><h4 id="9-x2F-30"><a href="#9-x2F-30" class="headerlink" title="9&#x2F;30"></a>9&#x2F;30</h4>]]></content>
       <categories>
         <category>Basic Skills</category>
       </categories>
@@ -1121,6 +1150,17 @@
         <tag>Semantic Segmentation</tag>
         <tag>Configure Environment</tag>
         <tag>Coding</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在BUPT计算集群环境下搭建ONE-PEACE运行环境</title>
+    <url>/2023/10/01/%E5%9C%A8BUPT%E8%AE%A1%E7%AE%97%E9%9B%86%E7%BE%A4%E7%8E%AF%E5%A2%83%E4%B8%8B%E6%90%AD%E5%BB%BAONE-PEACE%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/</url>
+    <content><![CDATA[<h3 id="任务背景"><a href="#任务背景" class="headerlink" title="任务背景"></a>任务背景</h3>]]></content>
+      <categories>
+        <category>Deep Learning</category>
+      </categories>
+      <tags>
+        <tag>Configure Environment</tag>
       </tags>
   </entry>
 </search>
