@@ -939,7 +939,7 @@
 <p><code>-s</code> : 将文本间多个空行合并为一个</p>
 <p><code>-E</code> : 在每个换行的位置显示一个<code>$</code>占位符，这样防止一行过长，<code>cat</code>时的换行并不是文本的换行，空行会在一开始有<code>$</code></p>
 <p><code>-T</code> : 将<code>Tab</code>以<code>^I</code>的格式显示出来，可以分辨是<code>Tab</code>还是空格</p>
-<h4 id="9-x2F-29-git"><a href="#9-x2F-29-git" class="headerlink" title="9&#x2F;29 git"></a>9&#x2F;29 git</h4><p><strong>git 拉取远程私有仓库(<a href="%5B%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8git%E4%BB%8Egithub%E6%8B%89%E5%8F%96%E8%87%AA%E5%B7%B1%E7%9A%84%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93(Token%E6%96%B9%E5%BC%8F%E3%80%81%E6%9C%AC%E5%9C%B0%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F)_%E8%8E%B7%E5%8F%96github%E7%9A%84token_Night-Breeze%E6%99%9A%E9%A3%8E%E7%9A%84%E5%8D%9A%E5%AE%A2-CSDN%E5%8D%9A%E5%AE%A2%5D(https://blog.csdn.net/qq_45491549/article/details/128825216)">参考博客</a>)</strong></p>
+<h4 id="9-x2F-29-git-Git-Graph插件使用"><a href="#9-x2F-29-git-Git-Graph插件使用" class="headerlink" title="9&#x2F;29 git(+Git Graph插件使用)"></a>9&#x2F;29 git(+Git Graph插件使用)</h4><p><strong>git 拉取远程私有仓库(<a href="%5B%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8git%E4%BB%8Egithub%E6%8B%89%E5%8F%96%E8%87%AA%E5%B7%B1%E7%9A%84%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93(Token%E6%96%B9%E5%BC%8F%E3%80%81%E6%9C%AC%E5%9C%B0%E7%A7%98%E9%92%A5%E6%96%B9%E5%BC%8F)_%E8%8E%B7%E5%8F%96github%E7%9A%84token_Night-Breeze%E6%99%9A%E9%A3%8E%E7%9A%84%E5%8D%9A%E5%AE%A2-CSDN%E5%8D%9A%E5%AE%A2%5D(https://blog.csdn.net/qq_45491549/article/details/128825216)">参考博客</a>)</strong></p>
 <p>工作流</p>
 <ol>
 <li><p>在Github上生成个人token</p>
@@ -969,9 +969,80 @@
 </ol>
 </li>
 </ol>
-<p><strong>Tips</strong></p>
+<p><strong>其它常见命令</strong></p>
 <ol>
-<li><code>git status</code>：查看当前 Git 仓库的状态，并且是在本地仓库中运行的。它会告诉你已经修改&#x2F;新增的文件、已经添加到暂存区的文件以及还未被 Git 跟踪的新文件等信息。</li>
+<li><p><code>git status</code>：查看当前 Git 仓库的状态，并且是在本地仓库中运行的。它会告诉你已经修改&#x2F;新增的文件、已经添加到暂存区的文件以及还未被 Git 跟踪的新文件等信息。</p>
+</li>
+<li><p><code>git fetch</code>：一种更安全温和的<code>git pull</code>，不会自动覆盖未commit的本地仓库修改，而是只检查远程仓库是否有新的提交或分支，并将这些信息下载到本地仓库中。</p>
+</li>
+<li><p><code>git merge</code>(内容来源为ChatGPT镜像)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310030920333.png" alt="image-20231003091713177"></p>
+</li>
+<li><p><code>git rebase</code>(内容来源为ChatGPT镜像)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310030920335.png" alt="image-20231003091843306"></p>
+</li>
+</ol>
+<p><strong>Git Graph – VsCode插件（可视化和便捷管理commit）</strong></p>
+<ol>
+<li><p>基础设置：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020777.png"></p>
+<blockquote>
+<p><code>Repo</code>：当前文件夹下如果有多个仓库，可以更换</p>
+<p><code>Branches</code>：<code>Show All</code>是默认，可以选择只显示某一个或几个分支</p>
+<p>右侧图标区从左到右为：<code>检索，终端，设置，fetch，fresh</code></p>
+<p>其中，<code>fetch</code>拉取远程commit，<code>fresh</code>将本页面更新</p>
+<p><code>设置</code>最重要的是2个内容：</p>
+<ol>
+<li><p>用户设置，自己的信息，自己开发时的个人贡献</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020778.png" alt="image-20231003101812255"></p>
+</li>
+<li><p>远程配置（如果git clone下来，默认就是fetch和push的仓库相同，可以自主更改）</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020780.png" alt="image-20231003101907953"></p>
+</li>
+</ol>
+</blockquote>
+</li>
+<li><p>如何查看分支信息(与Git Graph无关，补充知识)</p>
+<ol>
+<li><p>点击下面的<code>master</code>(现在默认的主分支已经是<code>main</code>)<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020781.png" alt="image-20231003093153993"></p>
+</li>
+<li><p>在弹出的框中，显示的当前已有的分支，并且可以创建新branch，☁标志是远程，特殊的是<code>origin/HEAD</code><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020782.png" alt="image-20231003093323486"></p>
+<blockquote>
+<p><code>origin/HEAD</code>: <img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020783.png" alt="image-20231003093929335"></p>
+</blockquote>
+</li>
+<li><p>Git Graph查看当前所在commit+分支</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020784.png" alt="image-20231003094558031"></p>
+<blockquote>
+<p>空心圆就是当前所在的commit，对应的branch框中就是当前分支(可以从红色框中内容看出：当前在本地的master分支，master对应分支为远程origin，并且本次commit是<code>origin/HEAD</code>-&gt;这也说明当前所在分支是master，因为origin&#x2F;HEAD指向当前所在分支&#x2F;commit)</p>
+<p>两种branch格式：</p>
+<ol>
+<li>由<code>|</code>分割的branch: <code>本地分支|对应远程分支</code></li>
+<li>由<code>/</code>分割的branch: <code>远程仓库/远程分支</code></li>
+</ol>
+</blockquote>
+</li>
+</ol>
+</li>
+<li><p>Git Graph实现简便的commit记录间对比和merge</p>
+<ol>
+<li><p>与commit的父节点对比</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020785.png" alt="image-20231003100101600"></p>
+<blockquote>
+<p>鼠标单击文件名即可查看和父节点commit的增删改（点击后，如下图所示，文件名的括号中<code>^</code>符号代表父记录）</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020786.png" alt="image-20231003100316778"></p>
+<p>鼠标悬停在文件名上可以看到更多打开文件的方法</p>
+</blockquote>
+</li>
+<li><p>与任意一条commit记录对比</p>
+<blockquote>
+<p>点击一条记录，再找到另一条想对比的记录，按住<code>Ctrl</code>点击需要对比的记录，在Git Graph中的效果为：（<strong>红框内即为对比的两条commit的ID</strong>）</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020787.png" alt="image-20231003100652060"></p>
+<p>进入<code>query_optimizer.py</code>文件中，如下图所示，可以从文件名看出确实是这两个ID的文件的对比，右上角的图标点击一下可以<strong>自动折叠没有发生更改的代码</strong>，专注于更改部分<img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031020788.png" alt="image-20231003100833601"></p>
+</blockquote>
+</li>
+</ol>
+</li>
 </ol>
 <h4 id="9-x2F-30"><a href="#9-x2F-30" class="headerlink" title="9&#x2F;30"></a>9&#x2F;30</h4>]]></content>
       <categories>
