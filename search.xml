@@ -1044,7 +1044,13 @@
 </ol>
 </li>
 </ol>
-<h4 id="9-x2F-30"><a href="#9-x2F-30" class="headerlink" title="9&#x2F;30"></a>9&#x2F;30</h4>]]></content>
+<h4 id="9-x2F-30-监控CPU和GPU资源"><a href="#9-x2F-30-监控CPU和GPU资源" class="headerlink" title="9&#x2F;30 监控CPU和GPU资源"></a>9&#x2F;30 监控CPU和GPU资源</h4><p><code>nvidia-smi pmon</code>: 动态监控GPU显存资源(各项条目如下)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310031322714.png" alt="image-20231003131929118"></p>
+<p><code>top</code>: 动态监控CPU占用情况</p>
+<blockquote>
+<p>top进入监控后，输入<code>k</code>(kill的缩写)，再<code>Enter</code>，最后输入kill指令的选项(<code>9</code>代表最高级)，可以快速杀掉占用最高CPU资源的进程</p>
+</blockquote>
+]]></content>
       <categories>
         <category>Basic Skills</category>
       </categories>
