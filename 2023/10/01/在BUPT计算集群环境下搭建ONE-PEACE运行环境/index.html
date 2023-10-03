@@ -27,11 +27,16 @@
 <meta property="og:site_name" content="Code×Life">
 <meta property="og:description" content="通过搭建ONE-PEACE的运行环境，总结学到的关于计算集群的知识">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="c:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20231001110309342.png">
+<meta property="og:image" content="c:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20231001104346053.png">
 <meta property="article:published_time" content="2023-10-01T02:29:27.000Z">
-<meta property="article:modified_time" content="2023-10-01T02:32:45.631Z">
+<meta property="article:modified_time" content="2023-10-01T05:54:47.896Z">
 <meta property="article:author" content="lyhkk">
+<meta property="article:tag" content="Transformer">
+<meta property="article:tag" content="Semantic Segmentation">
 <meta property="article:tag" content="Configure Environment">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20231001110309342.png">
 
 <link rel="canonical" href="http://example.com/2023/10/01/%E5%9C%A8BUPT%E8%AE%A1%E7%AE%97%E9%9B%86%E7%BE%A4%E7%8E%AF%E5%A2%83%E4%B8%8B%E6%90%AD%E5%BB%BAONE-PEACE%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83/">
 
@@ -213,7 +218,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2023-10-01 10:29:27 / 修改时间：10:32:45" itemprop="dateCreated datePublished" datetime="2023-10-01T10:29:27+08:00">2023-10-01</time>
+              <time title="创建时间：2023-10-01 10:29:27 / 修改时间：13:54:47" itemprop="dateCreated datePublished" datetime="2023-10-01T10:29:27+08:00">2023-10-01</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -244,7 +249,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="任务背景"><a href="#任务背景" class="headerlink" title="任务背景"></a>任务背景</h3>
+        <h3 id="任务背景"><a href="#任务背景" class="headerlink" title="任务背景"></a>任务背景</h3><ol>
+<li><p><mark><strong>将结果写在最前面</strong></mark>：复现失败，因为32G V100显卡还是<strong>显存不足</strong>，但环境搭建基本成功。本文是旨在<strong>总结使用计算集群、开源包，搭建运行环境</strong>的<strong>经验贴</strong></p>
+<p>PS: 日志文件截图（<strong>显存不足</strong>）</p>
+<p><img src="C:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20231001110309342.png" alt="image-20231001110309342"></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/OFA-Sys/ONE-PEACE">ONE-PEACE</a>是截至目前(2023&#x2F;10&#x2F;1)，在ADE20K数据集上做语义分割任务SOTA表现的模型(详见[Papers With Code](<a target="_blank" rel="noopener" href="https://paperswithcode.com/sota/semantic-segmentation-on-ade20k">ADE20K Benchmark (Semantic Segmentation) | Papers With Code</a>))，本次任务为复现ONE-PEACE模型的表现（基本不可能，因为原论文的结果是8块80G A100显卡跑出来的，算力差距大）</p>
+</li>
+<li><p>目前可用资源是 1）Linux主机：GPU配置为2×3090；2）北邮(BUPT)超算平台提供的GPU计算节点，算力见下图：</p>
+<p><img src="C:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20231001104346053.png" alt="image-20231001104346053"></p>
+</li>
+</ol>
+<h3 id="如何应对GPU显存不足的现状"><a href="#如何应对GPU显存不足的现状" class="headerlink" title="如何应对GPU显存不足的现状"></a>如何应对GPU显存不足的现状</h3><ol>
+<li>明确一个观点，<strong>任何trick都无法逾越算力差距的鸿沟</strong>（比如：本任务我们只有32G和24G两种显卡，论文的实验用到了80G A100），我们需要做的是尽可能的降低算力需求，即便今天我们做不出实验，但当下的尝试可以为未来的实验积累经验</li>
+<li>本次实验使用的两个小trick:</li>
+</ol>
+
     </div>
 
     
@@ -270,6 +290,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
+              <a href="/tags/Transformer/" rel="tag"># Transformer</a>
+              <a href="/tags/Semantic-Segmentation/" rel="tag"># Semantic Segmentation</a>
               <a href="/tags/Configure-Environment/" rel="tag"># Configure Environment</a>
           </div>
 
@@ -341,7 +363,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">任务背景</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">任务背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%BA%94%E5%AF%B9GPU%E6%98%BE%E5%AD%98%E4%B8%8D%E8%B6%B3%E7%9A%84%E7%8E%B0%E7%8A%B6"><span class="nav-number">2.</span> <span class="nav-text">如何应对GPU显存不足的现状</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -370,7 +392,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
