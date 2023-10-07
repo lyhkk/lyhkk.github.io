@@ -1268,17 +1268,93 @@
     <content><![CDATA[<h3 id="任务背景"><a href="#任务背景" class="headerlink" title="任务背景"></a>任务背景</h3><ol>
 <li><p><mark><strong>将结果写在最前面</strong></mark>：复现失败，因为32G V100显卡还是<strong>显存不足</strong>，但环境搭建基本成功。本文是旨在<strong>总结使用计算集群、开源包，搭建运行环境</strong>的<strong>经验贴</strong></p>
 <p>PS: 日志文件截图（<strong>显存不足</strong>）</p>
-<p><img src="C:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20231001110309342.png" alt="image-20231001110309342"></p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310071018644.png" alt="image-20231001110309342"></p>
 </li>
 <li><p><a href="https://github.com/OFA-Sys/ONE-PEACE">ONE-PEACE</a>是截至目前(2023&#x2F;10&#x2F;1)，在ADE20K数据集上做语义分割任务SOTA表现的模型(详见[Papers With Code](<a href="https://paperswithcode.com/sota/semantic-segmentation-on-ade20k">ADE20K Benchmark (Semantic Segmentation) | Papers With Code</a>))，本次任务为复现ONE-PEACE模型的表现（基本不可能，因为原论文的结果是8块80G A100显卡跑出来的，算力差距大）</p>
 </li>
-<li><p>目前可用资源是 1）Linux主机：GPU配置为2×3090；2）北邮(BUPT)超算平台提供的GPU计算节点，算力见下图：</p>
-<p><img src="C:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20231001104346053.png" alt="image-20231001104346053"></p>
+<li><p>目前可用资源是 1）Linux主机：GPU配置为2× 24G GTX 3090显卡；2）北邮(BUPT)超算平台提供的GPU计算节点，共3个GPU节点，每个节点多块Tesla V100 32G显卡，搭配OPA卡实现节点间高速通信</p>
 </li>
 </ol>
 <h3 id="如何应对GPU显存不足的现状"><a href="#如何应对GPU显存不足的现状" class="headerlink" title="如何应对GPU显存不足的现状"></a>如何应对GPU显存不足的现状</h3><ol>
-<li>明确一个观点，<strong>任何trick都无法逾越算力差距的鸿沟</strong>（比如：本任务我们只有32G和24G两种显卡，论文的实验用到了80G A100），我们需要做的是尽可能的降低算力需求，即便今天我们做不出实验，但当下的尝试可以为未来的实验积累经验</li>
-<li>本次实验使用的两个小trick:</li>
+<li><p>明确一个观点，<strong>任何trick都无法逾越算力差距的鸿沟</strong>（比如：本任务我们只有32G和24G两种显卡，论文的实验用到了80G A100），我们需要做的是尽可能的降低算力需求，即便今天我们做不出实验，但当下的尝试可以为未来的实验积累经验</p>
+</li>
+<li><p>本次实验使用的两个小trick -&gt; 降低显存占用: </p>
+<ol>
+<li><p><code>with_cp</code>参数：共享内存的手段，已经内置在<code>mmcv</code>包中，只需要config文件中，设置该bool型参数为True即可</p>
+</li>
+<li><p>降低输入图片的分辨率(from issue <a href="https://github.com/OFA-Sys/ONE-PEACE/issues/22">#22</a>)</p>
+<p>由于80G A100显卡硬件资源难得，作者提出可以将输入图像分辨率从<code>896×896</code>降至<code>512×512</code>。相应的，<code>config</code>文件中有需要与输入分辨率同时变化的条件 – <code>bucket_size</code>(用来计算相对位置编码，必须能被<code>input_resolution</code>整除)，需要从<code>56</code>降至<code>32</code></p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="使用计算集群（北邮超算中心）部署模型"><a href="#使用计算集群（北邮超算中心）部署模型" class="headerlink" title="使用计算集群（北邮超算中心）部署模型"></a>使用计算集群（北邮超算中心）部署模型</h3><p><strong>写在前面</strong>，本次实验失败最大的问题就在于对<strong>做实验的工作流</strong>还是不够清晰。当拿到一个计算资源要求极高的试验任务，<strong>最大的前提是实验的可行性</strong>。应该先租一个单卡V100，将运用trick的模型部署尝试一下，如果单卡跑不了，分布式也救不了</p>
+<ol>
+<li><p><strong>计算集群相关知识</strong></p>
+<ol>
+<li>面向本次任务，最重要的知识点就是<mark>Singularity容器化技术+Conda虚拟环境</mark><ol>
+<li>Singularity容器化技术<ol>
+<li>容器化技术的核心是：创建一个移植性好，使用便捷的镜像文件，简化安装包管理和兼容性问题。同时，可以与主机共享操作系统内核，保证了功能强大。</li>
+<li>Singularity <strong>1) <strong>专注于科学计算工作负载和HPC（高性能计算）环境。</strong>2)</strong> 它借助Linux环境下的用户命名空间和挂载功能，使得容器中的应用程序可以以与主机系统几乎相同的方式运行。</li>
+<li><mark>Singularity和Docker技术的不同</mark><ol>
+<li>Singularity可以在各个用户权限下使用，Docker需要root权限，<strong>灵活且安全</strong>，因为Singularity借用了主机上的用户命名空间，同时利用Linux的用户命名空间功能进行隔离。这种<mark>权限控制</mark>使得Singularity容器更加安全，避免了一些特权升级的风险</li>
+<li>Singularity容器<strong>可以与集群的资源管理系统（如Slurm、PBS等）无缝集成</strong>，HPC集群通常具有严格的资源管理和调度机制。Docker则不可以</li>
+<li>Singularity可以<strong>访问HPC专门设置的高性能互联网络</strong>（eg. OPA卡），而Docker容器使用的是主机上的标准网络接口，无法直接访问高性能互连网络。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Conda虚拟环境：将在下一部分”搭建环境遇到的问题”中，<code>MultiScaleDeformableAttention</code>编译问题中讲解—-为什么要在容器的基础上加入Conda虚拟环境</li>
+</ol>
+</li>
+<li>使用计算集群的三个层次：<ol>
+<li>在用户目录下：用户目录下，<mark>一般没有cuda和GPU</mark>。需要准备好项目文件和需要的预训练模型，因为Singularity容器与主机使用同一套文件目录，所以不会出问题（Docker就需要把文件放入Docker的工作目录）</li>
+<li>在容器环境内：使用<code>singularity shell &lt;容器名&gt;</code>进入容器，此时有了<mark>cuda</mark>，可以<code>nvcc -V</code>查看cuda版本号。需要在容器中安装包和依赖，方便开箱即用</li>
+<li>进入计算队列：排上队之后，硬件资源分配好之后，可以使用<mark>GPU和cuda</mark>，通常是预写好一个脚本，包括进入虚拟环境，进行需要GPU的模块的编译，包的安装，和训练脚本的执行</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><strong>搭建环境遇到的问题</strong></p>
+<ol>
+<li><p>基础Singularity镜像（创建Singularity容器比较简单）</p>
+<blockquote>
+<p>Python 3.8</p>
+<p>cuda     11.3</p>
+<p>Pytorch 1.11.0+cu113</p>
+</blockquote>
+</li>
+<li><p><code>opencv</code>安装问题：(在容器环境中安装)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310071018646.png" alt="image-20231007092325120"></p>
+<blockquote>
+<p>问题：缺少依赖库</p>
+<p>解决方案：配置文件<code>requirements.txt</code>中，要求安装<code>opencv-python</code>模块，有GUI模块，所以要安装相同版本的无GUI模块的<code>opencv-python-headless</code></p>
+</blockquote>
+</li>
+<li><p><code>MultiScaleDeformableAttention</code>编译问题(在进入计算队列后编译，因为编译需要GPU)</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310071018647.png" alt="image-20231007092942116"></p>
+<blockquote>
+<p>问题：导入包失败 -&gt; 编译包失败</p>
+<p>编译时的报错如下：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310071018648.png" alt="image-20231007093314342"></p>
+<p>从报错可以看出：问题处在我们使用的Python是<code>/opt/conda</code>下的，由于没有root权限，无法写入主目录。而正在编译的<code>MultiScaleDeformableAttention</code>模块是多尺度可变形注意力模块的cuda支持，编译成功会产生<code>.so</code>文件，也需要将链接写入目前使用的Python的site-packages。</p>
+<p>解决方案：在Singularity容器中使用Conda虚拟环境。<mark>Singularity容器中默认使用的还是&#x2F;opt&#x2F;conda下的，但使用Conda创建虚拟环境，就需要找到用户权限的Conda并使用</mark>，所以我们创建虚拟环境后(此时使用的是用户的Conda)，重新安装基础环境，只要在提交计算任务时，使用的脚本里<code>source activate &lt;虚拟环境&gt;</code>，就可以将<code>MultiScaleDeformableAttention</code>模块安装在有权限写入的<code>python3.8/site-packages</code>目录中</p>
+<p>最后的效果：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310071018649.png" alt="image-20231007094406703"></p>
+</blockquote>
+</li>
+<li><p>MMCV包安装的环境问题</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310071018650.png" alt="image-20231007100948843"></p>
+<blockquote>
+<p>分析问题：cuda:0上关于<code>ms_deform_attn_impl_forward</code>的实现没有找到，这个模块是和<code>MultiScaleDeformableAttention</code>相呼应的，因为使用的可变形的注意力模块，所以必须在<mark>有cuda和GPU的情况下，安装MMCV包</mark>。观察日志，如下图，MMCV确实没有在cuda下编译：</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310071018652.png" alt="image-20231007100850418"></p>
+<p>改变的方法：将MMCV包的安装写在提交任务，执行的脚本中，在有GPU环境下重新安装包</p>
+<p>最后的shell脚本:</p>
+<p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310071018653.png" alt="image-20231007101514148"></p>
+</blockquote>
+</li>
+</ol>
+</li>
 </ol>
 ]]></content>
       <categories>
