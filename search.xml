@@ -1070,7 +1070,7 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;variable&#125;_text</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>当需要在变量名称中使用操作符（例如 <code>:</code>，<code>-</code>，<code>+</code>）进行参数扩展时，需要使用 <code>$&#123;&#125;</code> 语法。例如：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">替换变量为默认值（如果变量未定义）</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var:-default_value&#125;</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">如果变量定义，则使用变量；否则退出脚本</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var:?error_message&#125;</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">在变量值前缀或后缀上添加字符串</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var_prefix&#125;text<span class="variable">$&#123;var_suffix&#125;</span></span></span><br></pre></td></tr></table></figure></li>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">替换变量为默认值（如果变量未定义）</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var:-default_value&#125;</span></span><br><span class="line">   </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">如果变量定义，则使用变量；否则退出脚本</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var:?error_message&#125;</span></span><br><span class="line">   </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">在变量值前缀或后缀上添加字符串</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var_prefix&#125;text<span class="variable">$&#123;var_suffix&#125;</span></span></span><br></pre></td></tr></table></figure></li>
 </ol>
 <p>除了上述情况外，可以直接使用 <code>$</code> 符号来引用变量。</p>
 </li>
@@ -1085,6 +1085,13 @@
 </ol>
 <p><img src="https://lyhkk-1314912494.cos.ap-beijing.myqcloud.com/Project/202310101420426.png" alt="image-20231010140314465"></p>
 </blockquote>
+<h4 id="11-x2F-27-mv移动多个文件"><a href="#11-x2F-27-mv移动多个文件" class="headerlink" title="11&#x2F;27 mv移动多个文件"></a>11&#x2F;27 mv移动多个文件</h4><p><code>mv</code>没有<code>-r</code>选项，所以可以用通配符移动多个文件</p>
+<p>eg: <code>mv *.txt data/</code></p>
+<h4 id="11-x2F-28-less管道"><a href="#11-x2F-28-less管道" class="headerlink" title="11&#x2F;28 less管道"></a>11&#x2F;28 less管道</h4><p><code>cat  filename | less</code>或任何预览一个文件的命令后+ <code>| less</code>可以使用less视图</p>
+<ul>
+<li><code>b</code>: 向上翻页</li>
+<li><code>[space]</code>: 向下翻页</li>
+</ul>
 ]]></content>
       <categories>
         <category>Basic Skills</category>
@@ -1400,6 +1407,98 @@
         <tag>Semantic Segmentation</tag>
         <tag>Configure Environment</tag>
         <tag>Computing Cluster</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker</title>
+    <url>/2023/11/28/Docker/</url>
+    <content><![CDATA[<h2 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h2><h3 id="Docker镜像、实例和容器之间的关系"><a href="#Docker镜像、实例和容器之间的关系" class="headerlink" title="Docker镜像、实例和容器之间的关系"></a>Docker镜像、实例和容器之间的关系</h3><p>Docker镜像、实例和容器之间的关系可以描述如下：</p>
+<ul>
+<li>Docker镜像：<strong>Docker镜像是一个静态的文件，其中包含了用于运行Docker容器的所有必要文件和依赖项</strong>。它类似于一个模板，用于创建Docker容器的运行时实例。镜像可以包含操作系统、应用程序代码、库文件、配置文件等。</li>
+<li>Docker实例：Docker实例是镜像的一个具体运行时表现形式。<strong>实例可以被视为已经启动但尚未完全运行的镜像</strong>。无论是镜像还是实例，它们都是静态的，不允许对其进行更改。</li>
+<li>Docker容器：<strong>Docker容器是Docker实例的运行状态</strong>。容器是在基于镜像创建的运行环境中运行的进程，其内部具有自己的文件系统、网络、进程空间等资源隔离机制。每个容器都是独立的、可隔离的运行实体。容器可以根据需要启动、停止、删除和重启。</li>
+</ul>
+<p>在Docker的概念中，我们可以将其类比为使用类定义创建对象的概念。镜像类似于一个定义，实例是应用该定义的具体对象，而容器则是运行时的对象，具有自己的状态和资源。</p>
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><ol>
+<li><p><code>docker cp</code>: 用于本地和容器工作目录间的文件传输，本地文件只有上传到docker容器的工作目录，才可以使用。</p>
+<blockquote>
+<p><code>docker cp</code>命令可以传输一个文件，或一个文件夹，但不能使用通配符来一次传递多个文件。</p>
+</blockquote>
+</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>Docker</category>
+      </categories>
+      <tags>
+        <tag>Virtual Technologies</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Reflections of LLM</title>
+    <url>/2023/10/11/Reflections-of-LLM/</url>
+    <content><![CDATA[<h3 id="行文思路"><a href="#行文思路" class="headerlink" title="行文思路"></a>行文思路</h3><blockquote>
+<p>ref</p>
+<ol>
+<li>CoreWeave: <a href="https://www.techflowpost.com/article/detail_12671.html">https://www.techflowpost.com/article/detail_12671.html</a></li>
+<li>Li Bojie: <a href="https://zhuanlan.zhihu.com/p/652585825">AI 大模型创业的 10 个灵魂拷问 - 知乎 (zhihu.com)</a></li>
+</ol>
+</blockquote>
+<ol>
+<li>先讲现状：调研各个LLM(GPT4-&gt;闭源 top模型, Claude, Microsoft Bing, copilot, 文心一言, ChatGLM, 讯飞星火)，要从全局上分析大模型-&gt;基础大模型、中间件、下游应用、fine-tuning的模型的现状。谈商业方面-&gt;股市，估值（运作方式，整体市场体量），黄老板Nvidia，商业化还需要向市场证明什么特性(稳定性, 高可用, 如何赋能)</li>
+<li>技术角度分析LLM，是否是骗局？LeCUN(反对LLM，认为人脑的思考模式和LLM有本质区别)，为什么ChatGPT一出现就火速出现了大量同类型产品(分析原因–技术没有很新，只是有人已经证明了可行性，所以同类产品马上涌现)</li>
+<li>根据自己的研究背景，LLM扩展到多模态-&gt;CV，再从比较了解的CV领域的发展（体外话：借助像何恺明这种最有标志性的AI学者的研究历程，谈谈研究开发者从个人角度出发，在大环境下如何给自己赋能）-&gt;借鉴到LLM</li>
+</ol>
+<h3 id="LLM产业现状"><a href="#LLM产业现状" class="headerlink" title="LLM产业现状"></a>LLM产业现状</h3><h4 id="LLM调研"><a href="#LLM调研" class="headerlink" title="LLM调研"></a>LLM调研</h4><p><mark>首先，需要对大模型有一个宏观总体的认识。</mark>我认为市面上时兴的大模型可以分为<strong>三大类</strong></p>
+<ol>
+<li>基础大模型：指<code>OpenAI -&gt; ChatGPT, GPT4</code>, <code>MetaAI -&gt; LLaMA</code>这种自行预训练，经过多轮优化推出的大模型。值得一提的是，MetaAI将大模型相关代码全部开源，并且提供了行业标杆的预训练数据集<a href="https://github.com/togethercomputer/RedPajama-Data">RedPajama</a></li>
+<li>fine-tune后服务于下游产业的大模型：基于基础大模型，为满足特定领域的需求，fine-tune的大模型。特点是更加专业化，开发周期短</li>
+<li>直接调用api做应用产品：严格意义上，并不能称之为一类大模型，但这是当下大模型最活跃的应用场景–计算机从业人员使用大模型占比还是最高，使用api接口, 可以为开发者提供更专门化的服务。在基础大模型的加持下，个人开发者、或是仅仅几个人的团队就可以通过更精细、更个性化的<code>Prompt</code>迅速完成开发，比如说2023&#x2F;10&#x2F;11 <a href="https://github.com/trending">Github trending榜</a>上，第一名<a href="https://github.com/Pythagora-io/gpt-pilot">gpt-pilot</a>就是基于基础大模型的api进行的二次开发，旨在帮助开发者快速编写可扩展的应用程序，同时开发人员可以监督，防止出现LLM由于理解误差导致的bug。</li>
+</ol>
+<p>在上面三类中，最值得一提就是基础大模型。2023&#x2F;4&#x2F;30，论文<a href="https://arxiv.org/abs/2304.13712">Harnessing the Power of LLMs in Practice: A Survey on ChatGPT and Beyond</a>的作者pull出一张从<strong>技术架构角度分类</strong>LLM的图，总结了语言大模型自2018年出现以来，所有的基础大模型如下图：(无<code>Claude 2</code>, 因为是2023&#x2F;7的产品)</p>
+<p><img src="C:\Users\86136\AppData\Roaming\Typora\typora-user-images\image-20231011162834623.png" alt="image-20231011162834623"></p>
+<blockquote>
+<p>上图中，先按照使用RNN&#x2F;Transformer架构可以分两类：</p>
+<p>RNN架构是灰色的树枝，其他都是Transformer架构下。可以看出RNN架构在2019年后再没有进展，这主要是因为循环神经网络(RNN)对上下文的检索能力有限，而语言大模型主要就是靠上下文长度(Token长度)提供更加符合语境的回答。</p>
+<p>在Transformer架构下，可以分为三类：</p>
+<ol>
+<li><code>Encoder-Only</code>: 上图的粉色线条，<code>Encoder</code>目前的做法主要是使用<code>Masked Attention</code>技术，通过预测掩码获得表达能力和预测能力；</li>
+<li><code>Encoder-Decoder</code>: 上图的绿色线条，Decoder是一种生成式技术。通常具有更强的序列学习和生成能力，尤其擅长实现输入序列到输出序列的结构映射，所以在机器翻译、文摘生成和聊天机器人等任务上有更好的应用前景；(从上图也可以看出：这条线路以Google为代表)</li>
+<li><code>Decoder-Only</code>: 上图中深蓝色线条，抛弃了Encoder后，结构更简单，训练和推理任务更加迅速，不需要为输入产生编码，专注于生成序列，这条线路也是目前最常见的大模型都在使用的(eg:GPT4, Claude 2)</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>杨植麟：AI领域对语言模型的认知，存在三个阶段的变化：</p>
+<p>2017年前，大家觉得语言模型有一些有限的作用，比如在这些语音识别、排序、语法、拼写等等小的场景里面可以做辅助，但用例（Use Case）都很小；<br>第二个阶段：Transformer、Bard出现后，语言模型可以做绝大部分的任务，但它还是一个辅助的角色——我有一个语言模型，AI工程师微调一下任务就好了；<br>到第三阶段，整个AI领域发展到最后，大家的认知会变成：所有东西其实都是语言模型，语言模型是唯一的问题，或者说是next token prediction（预测下一个字段）是唯一的问题。<br>这个世界其实就是一个硬盘模型，当人类文明数字化之后，所有人类文明之和就是硬盘的总和。输入的Token是语言，或者也可以是别的东西——只要能预测下一个Token是什么，那我就能实现了智能。<br>从思想到系统的层面，其实技术发生了非常大的变化，这里面有很多变量。然后你就可以在这个空间里面去看，怎么把这些技术做的更好。</p>
+</blockquote>
+<p><mark>接下来，我对几个最具有代表性的大模型进行了一些调研</mark></p>
+<ol>
+<li><strong>GPT4(GPT系列)</strong></li>
+<li><strong>Claude 2</strong></li>
+<li><strong>Stable Diffusion</strong></li>
+<li><strong>copilot</strong></li>
+</ol>
+<h4 id="LLM产业链"><a href="#LLM产业链" class="headerlink" title="LLM产业链"></a>LLM产业链</h4><h3 id="商业角度分析LLM产业痛点"><a href="#商业角度分析LLM产业痛点" class="headerlink" title="商业角度分析LLM产业痛点"></a>商业角度分析LLM产业痛点</h3><h3 id=""><a href="#" class="headerlink" title=""></a></h3>]]></content>
+      <categories>
+        <category>Work Log</category>
+      </categories>
+      <tags>
+        <tag>LLM</tag>
+        <tag>AI Industry</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CUDA运行时 &amp;&amp; CUDA驱动</title>
+    <url>/2023/10/13/Training/</url>
+    <content><![CDATA[<p>export ARCH&#x3D;arm<br>export CROSS_COMPILE&#x3D;arm-buildroot-linux-gnueabihf-<br>export PATH&#x3D;$PATH:&#x2F;home&#x2F;ubuntu&#x2F;cross_compile_tools&#x2F;gcc-linaro-14.0.0-2023.06-x86_64_arm-linux-gnueabihf&#x2F;bin</p>
+]]></content>
+      <categories>
+        <category>CUDA</category>
+      </categories>
+      <tags>
+        <tag>CUDA Version</tag>
+        <tag>GPU Training</tag>
       </tags>
   </entry>
 </search>
