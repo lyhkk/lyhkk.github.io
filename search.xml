@@ -1070,7 +1070,7 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;variable&#125;_text</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>当需要在变量名称中使用操作符（例如 <code>:</code>，<code>-</code>，<code>+</code>）进行参数扩展时，需要使用 <code>$&#123;&#125;</code> 语法。例如：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">替换变量为默认值（如果变量未定义）</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var:-default_value&#125;</span></span><br><span class="line">   </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">如果变量定义，则使用变量；否则退出脚本</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var:?error_message&#125;</span></span><br><span class="line">   </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">在变量值前缀或后缀上添加字符串</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var_prefix&#125;text<span class="variable">$&#123;var_suffix&#125;</span></span></span><br></pre></td></tr></table></figure></li>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">替换变量为默认值（如果变量未定义）</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var:-default_value&#125;</span></span><br><span class="line">      </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">如果变量定义，则使用变量；否则退出脚本</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var:?error_message&#125;</span></span><br><span class="line">      </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">在变量值前缀或后缀上添加字符串</span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">&#123;var_prefix&#125;text<span class="variable">$&#123;var_suffix&#125;</span></span></span><br></pre></td></tr></table></figure></li>
 </ol>
 <p>除了上述情况外，可以直接使用 <code>$</code> 符号来引用变量。</p>
 </li>
@@ -1092,6 +1092,17 @@
 <li><code>b</code>: 向上翻页</li>
 <li><code>[space]</code>: 向下翻页</li>
 </ul>
+<h4 id="12-x2F-23-git从远程仓库拉取分支"><a href="#12-x2F-23-git从远程仓库拉取分支" class="headerlink" title="12&#x2F;23 git从远程仓库拉取分支"></a>12&#x2F;23 git从远程仓库拉取分支</h4><ol>
+<li>新建一个空文件，文件名为proName（根据项目命名）；<br> 手动新建文件夹或命令 <code>mkdir proName</code></li>
+<li>初始化项目  <code>git init</code></li>
+<li>与远程分支建立关联（远程仓库链接在git上）<code>git remote add origin git@github.com:xxx/xxx.git</code></li>
+<li>拉取远程分支至本地  <code>git fetch origin dev</code>（dev为远程仓库的分支名）</li>
+<li>创建本地分支并关联到远程分支 <code>git checkout -b dev(本地分支名) origin/dev(远程分支名)</code></li>
+</ol>
+<blockquote>
+<p>至此，本地分支dev已与远程分支建立关联，并拉取dev分支项目，<code>git pull</code>可拉取项目远程所有分支，可通过如下命名查看本地分支及远程分支情况。</p>
+</blockquote>
+<p><code>git branch</code> 查看本地分支<br> <code>git branch -a</code> 查看当前所在分支及远程分支<br> <code>git branch -r</code> 查看远程分支<br> <code>git branch -vv</code> 查看本地分支与远程分支的关联关系</p>
 ]]></content>
       <categories>
         <category>Basic Skills</category>
